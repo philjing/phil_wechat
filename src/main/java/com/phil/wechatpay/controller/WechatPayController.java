@@ -18,7 +18,6 @@ import com.phil.common.config.WechatConfig;
 import com.phil.common.util.DateTimeUtil;
 import com.phil.common.util.HttpReqUtil;
 import com.phil.common.util.PayUtil;
-import com.phil.common.util.QRCodeGenerator;
 import com.phil.common.util.SignatureUtil;
 import com.phil.common.util.XmlUtil;
 import com.phil.wechatpay.model.rep.PayShortUrlParams;
@@ -203,41 +202,5 @@ public class WechatPayController {
 			logger.info("签名验证错误");
 		}
 		return null;
-	}
-	
-	public static void main(String[] args){
-		String nonce_str = PayUtil.createNonceStr();
-		String product_id = "product_001"; // 推荐根据商品ID生成
-		SortedMap<Object, Object> packageParams = new TreeMap<Object, Object>();
-		packageParams.put("appid", WechatConfig.APP_ID);
-		packageParams.put("mch_id", WechatConfig.MCH_ID);
-		packageParams.put("product_id", product_id);
-		packageParams.put("time_stamp", PayUtil.createTimeStamp());
-		packageParams.put("nonce_str", nonce_str);
-		String str = PayUtil.createPayImageUrl(packageParams);
-		String sign = SignatureUtil.createSign(packageParams,WechatConfig.API_KEY, SystemConfig.CHARACTER_ENCODING);
-		packageParams.put("sign", sign);
-		String payurl = "weixin://wxpay/bizpayurl?sign=" + sign + str;
-		logger.info("payurl is " + payurl);	
-		/**** 转成短链接 ****/
-		PayShortUrlParams payShortUrlParams = new PayShortUrlParams();
-		payShortUrlParams.setAppid(WechatConfig.APP_ID);
-		payShortUrlParams.setMch_id(WechatConfig.MCH_ID);
-		payShortUrlParams.setLong_url(payurl);
-		payShortUrlParams.setNonce_str(nonce_str);
-		String urlSign = SignatureUtil.createSign(payShortUrlParams,WechatConfig.API_KEY, SystemConfig.CHARACTER_ENCODING);
-		payShortUrlParams.setSign(urlSign);
-		String longXml = XmlUtil.toSplitXml(payShortUrlParams);
-		String shortResult = HttpReqUtil.HttpsDefaultExecute(HttpReqUtil.POST_METHOD, WechatConfig.PAY_SHORT_URL, null, longXml);
-		PayShortUrlResult payShortUrlResult = XmlUtil.getObjectFromXML(shortResult, PayShortUrlResult.class);
-		if("SUCCESS".equals(payShortUrlResult.getReturn_code())){
-			payurl = payShortUrlResult.getShort_url();
-			logger.info("payurl is " + payurl);	
-		}else{
-			logger.info("错误信息"+payShortUrlResult.getReturn_msg());
-		}
-		QRCodeGenerator handler = new QRCodeGenerator();
-		handler.encoderQRCode(payurl,"F:/微信/"+"支付二维码"+DateTimeUtil.currentTime()+".png", "png");
-		
 	}
 }
