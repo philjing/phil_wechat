@@ -10,8 +10,6 @@ import com.phil.wechat.base.result.ResultState;
  */
 public class JsapiTicket extends ResultState {
 
-	private static final long serialVersionUID = 5148872350042618605L;
-
 	private String ticket; //jsapi_ticket
 	
 	private String expires_in;

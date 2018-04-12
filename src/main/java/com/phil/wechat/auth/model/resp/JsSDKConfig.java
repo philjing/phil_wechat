@@ -9,8 +9,6 @@ import com.phil.wechat.base.result.AbstractResult;
  */
 public class JsSDKConfig extends AbstractResult {
 
-	private static final long serialVersionUID = 3710336862166262164L;
-
 	private String appId;
 
 	private long timestamp;
