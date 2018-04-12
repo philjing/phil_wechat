@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" output="target/classes" path="src/main/java">
+		<attributes>
+			<attribute name="optional" value="true"/>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry excluding="**" kind="src" output="target/classes" path="src/main/resources">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="src" output="target/test-classes" path="src/test/java">
+		<attributes>
+			<attribute name="optional" value="true"/>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/Software/sts-bundle/pivotal-tc-server-developer-3.2.9.RELEASE/tomcat-7.0.84.B.RELEASE/lib/annotations-api.jar"/>
+	<classpathentry kind="lib" path="C:/Software/sts-bundle/pivotal-tc-server-developer-3.2.9.RELEASE/tomcat-7.0.84.B.RELEASE/lib/catalina.jar"/>
+	<classpathentry kind="lib" path="C:/Software/sts-bundle/pivotal-tc-server-developer-3.2.9.RELEASE/tomcat-7.0.84.B.RELEASE/lib/catalina-ant.jar"/>
+	<classpathentry kind="lib" path="C:/Software/sts-bundle/pivotal-tc-server-developer-3.2.9.RELEASE/tomcat-7.0.84.B.RELEASE/lib/catalina-ha.jar"/>
+	<classpathentry kind="lib" path="C:/Software/sts-bundle/pivotal-tc-server-developer-3.2.9.RELEASE/tomcat-7.0.84.B.RELEASE/lib/catalina-tribes.jar"/>
+	<classpathentry kind="lib" path="C:/Software/sts-bundle/pivotal-tc-server-developer-3.2.9.RELEASE/tomcat-7.0.84.B.RELEASE/lib/ecj-4.4.2.jar"/>
+	<classpathentry kind="lib" path="C:/Software/sts-bundle/pivotal-tc-server-developer-3.2.9.RELEASE/tomcat-7.0.84.B.RELEASE/lib/el-api.jar"/>
+	<classpathentry kind="lib" path="C:/Software/sts-bundle/pivotal-tc-server-developer-3.2.9.RELEASE/tomcat-7.0.84.B.RELEASE/lib/jasper.jar"/>
+	<classpathentry kind="lib" path="C:/Software/sts-bundle/pivotal-tc-server-developer-3.2.9.RELEASE/tomcat-7.0.84.B.RELEASE/lib/jasper-el.jar"/>
+	<classpathentry kind="lib" path="C:/Software/sts-bundle/pivotal-tc-server-developer-3.2.9.RELEASE/tomcat-7.0.84.B.RELEASE/lib/jsp-api.jar"/>
+	<classpathentry kind="lib" path="C:/Software/sts-bundle/pivotal-tc-server-developer-3.2.9.RELEASE/tomcat-7.0.84.B.RELEASE/lib/servlet-api.jar"/>
+	<classpathentry kind="lib" path="C:/Software/sts-bundle/pivotal-tc-server-developer-3.2.9.RELEASE/tomcat-7.0.84.B.RELEASE/lib/tcServer.jar"/>
+	<classpathentry kind="lib" path="C:/Software/sts-bundle/pivotal-tc-server-developer-3.2.9.RELEASE/tomcat-7.0.84.B.RELEASE/lib/tomcat7-websocket.jar"/>
+	<classpathentry kind="lib" path="C:/Software/sts-bundle/pivotal-tc-server-developer-3.2.9.RELEASE/tomcat-7.0.84.B.RELEASE/lib/tomcat-api.jar"/>
+	<classpathentry kind="lib" path="C:/Software/sts-bundle/pivotal-tc-server-developer-3.2.9.RELEASE/tomcat-7.0.84.B.RELEASE/lib/tomcat-coyote.jar"/>
+	<classpathentry kind="lib" path="C:/Software/sts-bundle/pivotal-tc-server-developer-3.2.9.RELEASE/tomcat-7.0.84.B.RELEASE/lib/tomcat-dbcp.jar"/>
+	<classpathentry kind="lib" path="C:/Software/sts-bundle/pivotal-tc-server-developer-3.2.9.RELEASE/tomcat-7.0.84.B.RELEASE/lib/tomcat-i18n-es.jar"/>
+	<classpathentry kind="lib" path="C:/Software/sts-bundle/pivotal-tc-server-developer-3.2.9.RELEASE/tomcat-7.0.84.B.RELEASE/lib/tomcat-i18n-fr.jar"/>
+	<classpathentry kind="lib" path="C:/Software/sts-bundle/pivotal-tc-server-developer-3.2.9.RELEASE/tomcat-7.0.84.B.RELEASE/lib/tomcat-i18n-ja.jar"/>
+	<classpathentry kind="lib" path="C:/Software/sts-bundle/pivotal-tc-server-developer-3.2.9.RELEASE/tomcat-7.0.84.B.RELEASE/lib/tomcat-jdbc.jar"/>
+	<classpathentry kind="lib" path="C:/Software/sts-bundle/pivotal-tc-server-developer-3.2.9.RELEASE/tomcat-7.0.84.B.RELEASE/lib/tomcat-util.jar"/>
+	<classpathentry kind="lib" path="C:/Software/sts-bundle/pivotal-tc-server-developer-3.2.9.RELEASE/tomcat-7.0.84.B.RELEASE/lib/websocket-api.jar"/>
+	<classpathentry kind="output" path="target/classes"/>
+</classpath>
