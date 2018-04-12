@@ -9,16 +9,10 @@ package com.phil.wechat.base.result;
  */
 public class WechatResult extends AbstractResult {
 
-	private static final long serialVersionUID = -6042143459401682761L;
-
 	public static final int NEWSMSG = 1; // 图文消息
-
 	private boolean success;
-
 	private int type;
-	
 	private Object object;
-	
 	private String msg;
 
 	public boolean isSuccess() {

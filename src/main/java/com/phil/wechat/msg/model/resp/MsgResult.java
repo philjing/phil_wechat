@@ -10,7 +10,6 @@ import com.phil.wechat.base.result.ResultState;
  */
 public class MsgResult extends ResultState{
 	
-	private static final long serialVersionUID = 5919613427515551136L;
 	private String msg_id; // 消息id
 	private String msgid; // 消息id(发送模板消息)
 

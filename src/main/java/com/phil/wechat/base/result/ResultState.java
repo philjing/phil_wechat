@@ -9,10 +9,7 @@ package com.phil.wechat.base.result;
  */
 public class ResultState extends AbstractResult {
 	
-	private static final long serialVersionUID = 1692432930341768342L;
-
 	private int errcode; // 状态
-	
 	private String errmsg; //信息
 
 	public int getErrcode() {

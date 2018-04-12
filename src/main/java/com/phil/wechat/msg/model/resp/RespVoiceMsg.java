@@ -1,7 +1,5 @@
 package com.phil.wechat.msg.model.resp;
 
-import com.phil.wechat.msg.model.resp.bean.Voice;
-
 /**
  * 回复语音消息
  * 
@@ -24,5 +22,25 @@ public class RespVoiceMsg extends RespAbstractMsg {
 	@Override
 	public String setMsgType() {
 		return "voice";
+	}
+
+	/**
+	 * 
+	 * @author phil
+	 * @data 2017年6月30日
+	 *
+	 */
+	public class Voice {
+
+		// 通过素材管理中的接口上传多媒体文件，得到的id。
+		private String MediaId;
+
+		public String getMediaId() {
+			return MediaId;
+		}
+
+		public void setMediaId(String mediaId) {
+			MediaId = mediaId;
+		}
 	}
 }

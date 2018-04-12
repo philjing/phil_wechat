@@ -3,17 +3,17 @@ package com.phil.modules.util;
 import com.phil.modules.util.XmlUtil.XStreamFactroy;
 import com.phil.wechat.msg.model.resp.RespAbstractMsg;
 import com.phil.wechat.msg.model.resp.RespImageMsg;
+import com.phil.wechat.msg.model.resp.RespImageMsg.Image;
 import com.phil.wechat.msg.model.resp.RespMusicMsg;
+import com.phil.wechat.msg.model.resp.RespMusicMsg.Music;
 import com.phil.wechat.msg.model.resp.RespNewsMsg;
+import com.phil.wechat.msg.model.resp.RespNewsMsg.Articles;
+import com.phil.wechat.msg.model.resp.RespNewsMsg.Articles.Item;
 import com.phil.wechat.msg.model.resp.RespTextMsg;
 import com.phil.wechat.msg.model.resp.RespVideoMsg;
+import com.phil.wechat.msg.model.resp.RespVideoMsg.Video;
 import com.phil.wechat.msg.model.resp.RespVoiceMsg;
-import com.phil.wechat.msg.model.resp.bean.Articles;
-import com.phil.wechat.msg.model.resp.bean.Image;
-import com.phil.wechat.msg.model.resp.bean.Item;
-import com.phil.wechat.msg.model.resp.bean.Music;
-import com.phil.wechat.msg.model.resp.bean.Video;
-import com.phil.wechat.msg.model.resp.bean.Voice;
+import com.phil.wechat.msg.model.resp.RespVoiceMsg.Voice;
 import com.thoughtworks.xstream.XStream;
 
 /**
