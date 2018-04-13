@@ -198,6 +198,10 @@ public class WechatMsgController extends BaseController {
 		return result;
 	}
 	
+	/**
+	 * 仅仅是个示例
+	 * @return
+	 */
 	public TemplateMsgResult sendTemplate(){
 		TemplateMsgResult templateMsgResult = null;
 		TreeMap<String,TreeMap<String,String>> params = new TreeMap<String,TreeMap<String,String>>();
