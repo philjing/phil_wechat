@@ -1,6 +1,7 @@
 package com.phil.modules.util;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -113,7 +114,7 @@ public class SignatureUtil {
 	 * @throws IllegalAccessException
 	 */
 	public static String notSignParams(Object o, String apiKey) {
-		ArrayList<String> list = new ArrayList<String>();
+		ArrayList<String> list = new ArrayList<>();
 		String result = "";
 		try {
 			Class<?> cls = o.getClass();
@@ -206,9 +207,11 @@ public class SignatureUtil {
 		MessageDigest md = null;
 		try {
 			md = MessageDigest.getInstance("SHA-1");
-			byte[] digest = md.digest(result.getBytes());
+			byte[] digest = md.digest(result.getBytes(characterEncoding));
 			result = byteToStr(digest);
 		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
 		return result;
@@ -239,7 +242,7 @@ public class SignatureUtil {
 	 * @return 待加密的字符串
 	 */
 	public static String notSignParams(Map<Object, Object> params, String apiKey) {
-		ArrayList<String> list = new ArrayList<String>();
+		ArrayList<String> list = new ArrayList<>();
 		for (Map.Entry<Object, Object> entry : params.entrySet()) {
 			if (entry.getValue() != "" && entry.getValue() != null) {
 				list.add(entry.getKey() + "=" + entry.getValue() + "&");

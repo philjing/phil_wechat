@@ -50,7 +50,7 @@ public class XmlUtil {
 	 */
 	@SuppressWarnings("unchecked")
 	public static Map<String, String> parseXmlToMap(HttpServletRequest request){
-		Map<String, String> map = new HashMap<String, String>();	
+		Map<String, String> map = new HashMap<>();	
 		InputStream inputStream = null;
 		try {
 			// 从request中取得输入流
@@ -67,9 +67,9 @@ public class XmlUtil {
 				map.put(e.getName(), e.getText());
 			}
 		} catch (IOException e) {
-			
+			e.printStackTrace();
 		} catch (DocumentException e) {
-			
+			e.printStackTrace();
 		} finally {
 			IOUtils.closeQuietly(inputStream);
 		}
@@ -89,7 +89,7 @@ public class XmlUtil {
 	 */
 	@SuppressWarnings("unchecked")
 	public static Map<String, String> parseStreamToMap(InputStream inputStream) throws Exception {
-		Map<String, String> map = new HashMap<String, String>();
+		Map<String, String> map = new HashMap<>();
 		try {
 			// 读取输入流
 			SAXReader reader = new SAXReader();

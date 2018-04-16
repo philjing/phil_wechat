@@ -9,8 +9,6 @@ import java.util.SortedMap;
 import java.util.UUID;
 
 import com.phil.modules.config.SystemConfig;
-import com.phil.modules.config.WechatConfig;
-import com.phil.wechat.pay.model.rep.AbstractPayParams;
 
 /**
  * 支付的辅助工具类
@@ -82,11 +80,5 @@ public class PayUtil {
 			}
 		}
 		return buffer.toString();
-	}
-	
-	public static String abstractPayToXml(AbstractPayParams params) {
-		String sign = SignatureUtil.createSign(params, WechatConfig.API_KEY, SystemConfig.DEFAULT_CHARACTER_ENCODING);
-		params.setSign(sign);
-		return XmlUtil.toSplitXml(params);
 	}
 }

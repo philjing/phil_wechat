@@ -56,9 +56,7 @@ import com.phil.wechat.msg.model.resp.UploadMediasResult;
 public class HttpReqUtil {
 
 	private static int DEFAULT_CONNTIME = 5000;
-
 	private static int DEFAULT_READTIME = 5000;
-
 	private static int DEFAULT_UPLOAD_READTIME = 10 * 1000;
 
 	/**
@@ -558,7 +556,7 @@ public class HttpReqUtil {
 		TreeMap<String, String> params = new TreeMap<String, String>();
 		params.put("access_token", accessToken);
 		// post 提交的参数
-		TreeMap<String, List<UploadNews>> dataParams = new TreeMap<String, List<UploadNews>>();
+		TreeMap<String, List<UploadNews>> dataParams = new TreeMap<>();
 		dataParams.put("articles", entity);
 		String data = JsonUtil.toJsonString(dataParams);
 		String result = HttpsDefaultExecute(SystemConfig.POST_METHOD, WechatConfig.UPLOAD_NEWS_MEDIA_URL, params, data);
