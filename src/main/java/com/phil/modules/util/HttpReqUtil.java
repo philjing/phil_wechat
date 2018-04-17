@@ -553,7 +553,7 @@ public class HttpReqUtil {
 	public static UploadnewsResult uploadNewsMedia(String accessToken, List<UploadNews> entity) {
 		UploadnewsResult resultObj = null;
 		// url 的参数
-		TreeMap<String, String> params = new TreeMap<String, String>();
+		TreeMap<String, String> params = new TreeMap<>();
 		params.put("access_token", accessToken);
 		// post 提交的参数
 		TreeMap<String, List<UploadNews>> dataParams = new TreeMap<>();
@@ -571,7 +571,7 @@ public class HttpReqUtil {
 	 */
 	public UploadnewsResult uploadVideo(String accessToken, String url, String data) {
 		UploadnewsResult state = null;
-		TreeMap<String, String> params = new TreeMap<String, String>();
+		TreeMap<String, String> params = new TreeMap<>();
 		params.put("access_token", accessToken);
 		String result = HttpsDefaultExecute(SystemConfig.POST_METHOD, "uploadVideoPath", params, data);
 		state = JsonUtil.fromJsonString(result,UploadnewsResult.class);
@@ -591,7 +591,7 @@ public class HttpReqUtil {
 
 	public static UploadMediasResult uploadTempMediaFile(String accessToken, String type, String path) {
 		UploadMediasResult result = null;
-		TreeMap<String, String> params = new TreeMap<String, String>();
+		TreeMap<String, String> params = new TreeMap<>();
 		params.put("access_token", accessToken);
 		params.put("type", type);
 		try {
@@ -616,7 +616,7 @@ public class HttpReqUtil {
 	 */
 	public static UploadMediasResult uploadTempMedia(String accessToken, String type, String path) {
 		UploadMediasResult result = null;
-		TreeMap<String, String> params = new TreeMap<String, String>();
+		TreeMap<String, String> params = new TreeMap<>();
 		params.put("access_token", accessToken);
 		params.put("type", type);
 		try {
@@ -637,7 +637,7 @@ public class HttpReqUtil {
 	 * @return
 	 */
 	public static String uploadImgMediaFile(String accessToken, String path) {
-		TreeMap<String, String> params = new TreeMap<String, String>();
+		TreeMap<String, String> params = new TreeMap<>();
 		params.put("access_token", accessToken);
 		String url = null;
 		try {
@@ -659,7 +659,7 @@ public class HttpReqUtil {
 	 * @return
 	 */
 	public static String uploadImgMedia(String accessToken, String path) {
-		TreeMap<String, String> params = new TreeMap<String, String>();
+		TreeMap<String, String> params = new TreeMap<>();
 		params.put("access_token", accessToken);
 		String url = null;
 		try {

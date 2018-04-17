@@ -24,6 +24,7 @@ import com.phil.modules.config.SystemConfig;
 import com.phil.modules.config.WechatConfig;
 import com.phil.modules.util.DateTimeUtil;
 import com.phil.modules.util.HttpReqUtil;
+import com.phil.modules.util.MsgUtil;
 import com.phil.modules.util.PayUtil;
 import com.phil.modules.util.SignatureUtil;
 import com.phil.modules.util.XmlUtil;
@@ -94,7 +95,7 @@ public class WechatPayController extends BaseController {
 		unifiedOrderParams.setOpenid(params.getOpenid());
 		unifiedOrderParams.setNotify_url(WechatConfig.NOTIFY_URL);// 异步通知url
 		// 统一下单 请求的Xml(正常的xml格式)
-		String unifiedXmL = PayUtil.abstractPayToXml(unifiedOrderParams);//// 签名并入util
+		String unifiedXmL = MsgUtil.abstractPayToXml(unifiedOrderParams);// 签名并入util
 		// 返回<![CDATA[SUCCESS]]>格式的XML
 		String unifiedOrderResultXmL = HttpReqUtil.HttpsDefaultExecute(SystemConfig.POST_METHOD,
 				WechatConfig.UNIFIED_ORDER_URL, null, unifiedXmL);
@@ -209,7 +210,7 @@ public class WechatPayController extends BaseController {
 		unifiedOrderParams.setTrade_type("NATIVE");// 必须
 		unifiedOrderParams.setNotify_url(WechatConfig.NOTIFY_URL); // 异步通知URL
 		// 统一下单 请求的Xml(除detail外不需要<![CDATA[product_001]]>格式)
-		String unifiedXmL = PayUtil.abstractPayToXml(unifiedOrderParams); // 签名并入util
+		String unifiedXmL = MsgUtil.abstractPayToXml(unifiedOrderParams); // 签名并入util
 		// logger.debug("统一下单 请求的Xml"+unifiedXmL);
 		// 统一下单 返回的xml(<![CDATA[product_001]]>格式)
 		String unifiedResultXmL = HttpReqUtil.HttpsDefaultExecute(SystemConfig.POST_METHOD,
