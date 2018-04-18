@@ -35,16 +35,19 @@ public class WechatAuthServiceImpl implements WechatAuthService {
 	/**
 	 * 获取授权凭证token
 	 * 
-	 * @param key 应用appid
-	 * @param secret 应用密匙
+	 * @param key
+	 *            应用appid
+	 * @param secret
+	 *            应用密匙
 	 * @return json格式的字符串
 	 */
 	public static String getAccessToken(String appid, String secret) {
-		TreeMap<String, String> map = new TreeMap<String, String>();
+		TreeMap<String, String> map = new TreeMap<>();
 		map.put("grant_type", "client_credential");
 		map.put("appid", appid);
 		map.put("secret", secret);
-		String json = HttpReqUtil.HttpDefaultExecute(SystemConfig.GET_METHOD, WechatConfig.GET_ACCESS_TOKEN_URL, map, "");
+		String json = HttpReqUtil.HttpDefaultExecute(SystemConfig.GET_METHOD, WechatConfig.GET_ACCESS_TOKEN_URL, map,
+				"");
 		String result = null;
 		AccessToken accessToken = JsonUtil.fromJsonString(json, AccessToken.class);
 		if (accessToken != null) {
@@ -78,10 +81,11 @@ public class WechatAuthServiceImpl implements WechatAuthService {
 		AuthAccessToken authAccessToken = null;
 		// 获取网页授权凭证
 		try {
-			String result = HttpReqUtil.HttpsDefaultExecute(SystemConfig.GET_METHOD, url, basic.getParams(), null);
-			if (result != null) {
-				authAccessToken = JsonUtil.fromJsonString(result, AuthAccessToken.class);
+			if (StringUtils.isEmpty(url)) {
+				url = WechatConfig.GET_OAUTH_TOKEN_URL;
 			}
+			String result = HttpReqUtil.HttpsDefaultExecute(SystemConfig.GET_METHOD, url, basic.getParams(), null);
+			authAccessToken = JsonUtil.fromJsonString(result, AuthAccessToken.class);
 		} catch (Exception e) {
 			logger.debug("error" + e.getMessage());
 		}
@@ -101,10 +105,11 @@ public class WechatAuthServiceImpl implements WechatAuthService {
 		AuthAccessToken authAccessToken = null;
 		// 刷新网页授权凭证
 		try {
-			String result = HttpReqUtil.HttpsDefaultExecute(SystemConfig.GET_METHOD, url, basic.getParams(), null);
-			if (result != null) {
-				authAccessToken = JsonUtil.fromJsonString(result, AuthAccessToken.class);
+			if (StringUtils.isEmpty(url)) {
+				url = WechatConfig.REFRESH_OAUTH_TOKEN_URL;
 			}
+			String result = HttpReqUtil.HttpsDefaultExecute(SystemConfig.GET_METHOD, url, basic.getParams(), null);
+			authAccessToken = JsonUtil.fromJsonString(result, AuthAccessToken.class);
 		} catch (Exception e) {
 			logger.debug("error" + e.getMessage());
 		}
@@ -121,17 +126,15 @@ public class WechatAuthServiceImpl implements WechatAuthService {
 	public AuthUserInfo getAuthUserInfo(String accessToken, String openid) {
 		AuthUserInfo authUserInfo = null;
 		// 通过网页授权获取用户信息
-		Map<String, String> params = new TreeMap<String, String>();
+		Map<String, String> params = new TreeMap<>();
 		params.put("openid", openid);
 		params.put("access_token", accessToken);
 		String result = HttpReqUtil.HttpsDefaultExecute(SystemConfig.GET_METHOD, WechatConfig.SNS_USERINFO_URL, params,
 				null);
-		if (null != result) {
-			try {
-				authUserInfo = JsonUtil.fromJsonString(result, AuthUserInfo.class);
-			} catch (JsonSyntaxException e) {
-				logger.debug("transfer exception");
-			}
+		try {
+			authUserInfo = JsonUtil.fromJsonString(result, AuthUserInfo.class);
+		} catch (JsonSyntaxException e) {
+			logger.debug("transfer exception");
 		}
 		return authUserInfo;
 	}
@@ -148,14 +151,12 @@ public class WechatAuthServiceImpl implements WechatAuthService {
 	 */
 	public ResultState authToken(String accessToken, String openid) {
 		ResultState state = null;
-		Map<String, String> params = new TreeMap<String, String>();
+		Map<String, String> params = new TreeMap<>();
 		params.put("access_token", accessToken);
 		params.put("openid", openid);
 		String jsonResult = HttpReqUtil.HttpDefaultExecute(SystemConfig.GET_METHOD,
 				WechatConfig.CHECK_SNS_AUTH_STATUS_URL, params, "");
-		if (jsonResult != null) {
-			state = JsonUtil.fromJsonString(jsonResult, ResultState.class);
-		}
+		state = JsonUtil.fromJsonString(jsonResult, ResultState.class);
 		return state;
 	}
 
@@ -166,14 +167,12 @@ public class WechatAuthServiceImpl implements WechatAuthService {
 	 */
 	public String getTicket(String accessToken) {
 		JsapiTicket jsapiTicket = null;
-		Map<String, String> params = new TreeMap<String, String>();
+		Map<String, String> params = new TreeMap<>();
 		params.put("access_token", accessToken);
 		params.put("type", "jsapi");
 		String result = HttpReqUtil.HttpDefaultExecute(SystemConfig.GET_METHOD, WechatConfig.GET_TICKET_URL, params,
 				"");
-		if (StringUtils.isNotBlank(result)) {
-			jsapiTicket = JsonUtil.fromJsonString(result, JsapiTicket.class);
-		}
+		jsapiTicket = JsonUtil.fromJsonString(result, JsapiTicket.class);
 		if (jsapiTicket.getErrcode() == 0) {
 			return jsapiTicket.getTicket();
 		}

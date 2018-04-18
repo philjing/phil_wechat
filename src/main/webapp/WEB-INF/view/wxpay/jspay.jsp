@@ -30,7 +30,7 @@
         type:"post",
         url:url,
         dataType:"json",
-        data:{openId:'${openId}'},
+        data:{openId:'${openId}'}, //自行拼接body,total_fee等参数
         success:function(data) {
         	if(data.resultCode == 'SUCCESS'){
         		appId = data.appId;

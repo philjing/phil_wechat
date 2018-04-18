@@ -5,7 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 import java.util.Random;
-import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.UUID;
 
 import com.phil.modules.config.SystemConfig;
@@ -72,9 +72,9 @@ public class PayUtil {
 	 * @param params
 	 * @return
 	 */
-	public static String createPayImageUrl(SortedMap<Object, Object> params) {
+	public static String createPayImageUrl(TreeMap<String, Object> params) {
 		StringBuffer buffer = new StringBuffer();
-		for (Map.Entry<Object, Object> entry : params.entrySet()) {
+		for (Map.Entry<String, Object> entry : params.entrySet()) {
 			if (entry.getValue() != null) {
 				buffer.append("&" + entry.getKey() + "=" + entry.getValue());
 			}

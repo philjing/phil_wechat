@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.SortedMap;
 import java.util.TreeMap;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -47,27 +46,24 @@ public class WechatPayController extends BaseController {
 
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-//	public static int defaultWidthAndHeight = 200;
-	
+	// public static int defaultWidthAndHeight = 200;
 
 	@GetMapping("/payhtml")
-	public String oauthBind(Map<String,Object> data) throws Exception {
+	public String oauthBind(Map<String, Object> data) throws Exception {
 		UnifiedOrderParams params = new UnifiedOrderParams();
 		data.put("params", params);
-		return "wechat/pay/h5pay";	
+		return "wechat/pay/h5pay";
 	}
 
 	/**
 	 * 微信内H5调起支付
 	 * 
-	 * @param request
-	 * @param response
-	 * @param openId
+	 * @param params
 	 * @return
 	 * @throws Exception
 	 */
 	@PostMapping("jspay")
-	public Map<String, Object> jsPay(@ModelAttribute(value="params") UnifiedOrderParams params) {
+	public Map<String, Object> jsPay(@ModelAttribute(value = "params") UnifiedOrderParams params) {
 		Map<String, Object> data = new HashMap<>();
 		JsPayResult result = null;
 		if (StringUtils.isEmpty(params) || StringUtils.isEmpty(params.getOpenid())) {
@@ -136,23 +132,23 @@ public class WechatPayController extends BaseController {
 	/**
 	 * 扫码支付模式一生成二维码
 	 * 
-	 * @param request
-	 * @param response
+	 * @param productId 商品ID
 	 * @throws IOException
 	 */
-	@GetMapping("qrcode")
-	public Map<String, Object> createPayImage(String productId) {
+	@GetMapping("payone")
+	public Map<String, Object> payone(String productId) {
 		Map<String, Object> data = new HashMap<>();
 		String nonce_str = PayUtil.createNonceStr();
-//		String product_id = "product_001"; // 推荐根据商品ID生成
-		SortedMap<Object, Object> packageParams = new TreeMap<Object, Object>();
+		// String product_id = "product_001"; // 推荐根据商品ID生成
+		TreeMap<String, Object> packageParams = new TreeMap<>();
 		packageParams.put("appid", WechatConfig.APP_ID);
 		packageParams.put("mch_id", WechatConfig.MCH_ID);
 		packageParams.put("product_id", productId);
 		packageParams.put("time_stamp", PayUtil.createTimeStamp());
 		packageParams.put("nonce_str", nonce_str);
 		String str_url = PayUtil.createPayImageUrl(packageParams);
-		String sign = SignatureUtil.createSign(packageParams, WechatConfig.API_KEY, SystemConfig.DEFAULT_CHARACTER_ENCODING);
+		String sign = SignatureUtil.createSign(packageParams, WechatConfig.API_KEY,
+				SystemConfig.DEFAULT_CHARACTER_ENCODING);
 		packageParams.put("sign", sign);
 		String payurl = "weixin://wxpay/bizpayurl?sign=" + sign + str_url;
 		logger.debug("payurl is {}", payurl);
@@ -169,21 +165,20 @@ public class WechatPayController extends BaseController {
 		String shortResult = HttpReqUtil.HttpsDefaultExecute(SystemConfig.POST_METHOD, WechatConfig.PAY_SHORT_URL, null,
 				longXml);
 		PayShortUrlResult payShortUrlResult = XmlUtil.getObjectFromXML(shortResult, PayShortUrlResult.class);
-		if(Objects.equals("SUCCESS", payShortUrlResult.getReturn_code())) {
+		if (Objects.equals("SUCCESS", payShortUrlResult.getReturn_code())) {
 			payurl = payShortUrlResult.getShort_url();
 		} else {
 			logger.debug("错误信息" + payShortUrlResult.getReturn_msg());
 		}
-		/**** 生成 二维码图片自己实现 ****/
-//		return null;
+		/**** 生成 二维码图片自行实现 ****/
+		
 		return data;
 	}
 
 	/**
 	 * 扫码模式二
 	 * 
-	 * @param request
-	 * @param response
+	 * @param params
 	 * @throws Exception
 	 */
 	@RequestMapping("paytwo")
@@ -192,9 +187,9 @@ public class WechatPayController extends BaseController {
 		// 商户后台系统根据用户选购的商品生成订单。
 		String out_trade_no = PayUtil.createNonceStr();
 		String product_id = DateTimeUtil.getCurrTime();// 根据自己的逻辑生成
-//		int total_fee = 1; // 1分作测试
-//		String attach = "支付测试";
-//		String body = "微信支付-支付测试";
+		// int total_fee = 1; // 1分作测试
+		// String attach = "支付测试";
+		// String body = "微信支付-支付测试";
 		String nonce_str = PayUtil.createNonceStr();
 		String spbill_create_ip = HttpReqUtil.getRemortIP(this.getRequest()); // 获取IP
 		UnifiedOrderParams unifiedOrderParams = new UnifiedOrderParams();
@@ -220,7 +215,7 @@ public class WechatPayController extends BaseController {
 		if (SignatureUtil.checkIsSignValidFromWeiXin(unifiedResultXmL)) {
 			UnifiedOrderResult unifiedOrderResult = XmlUtil.getObjectFromXML(unifiedResultXmL,
 					UnifiedOrderResult.class);
-			if(Objects.equals("SUCCESS", unifiedOrderResult.getReturn_code())
+			if (Objects.equals("SUCCESS", unifiedOrderResult.getReturn_code())
 					&& Objects.equals("SUCCESS", unifiedOrderResult.getResult_code())) {
 				/**** 根据unifiedOrderResult.getCode_url()生成有效期为2小时的二维码 ****/
 

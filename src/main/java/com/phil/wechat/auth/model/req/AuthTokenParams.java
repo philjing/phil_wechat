@@ -14,7 +14,6 @@ import com.phil.wechat.base.param.AbstractParams;
 public class AuthTokenParams extends AbstractParams {
 	
 	private static final long serialVersionUID = 4652953400751046159L;
-	
 	private String appid; //公众号的唯一标识
 	private String secret; //公众号的appsecret
 	private String code; //填写第一步获取的code参数
