@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 
 import com.phil.wechat.base.result.WechatResult;
-import com.phil.wechat.msg.model.media.UploadNews;
+import com.phil.wechat.msg.model.media.MpVideoMedia;
 import com.phil.wechat.msg.model.req.BasicMsg;
-import com.phil.wechat.msg.model.resp.MsgResult;
+import com.phil.wechat.msg.model.resp.MassMsgResult;
 import com.phil.wechat.msg.model.template.resp.TemplateMsgResult;
 
 /**
@@ -178,31 +178,109 @@ public interface WechatMsgService {
 	public TemplateMsgResult sendTemplate(String accessToken,String data);
 	
 	/**
-	 * 上传图文消息的素材
-	 * 
+	 * 根据标签进行群发文本消息
 	 * @param accessToken  授权token
-	 * @param path 路径
 	 * @param entity  图文消息对象
-	 * @return   result.isSuccess 则返回成功信息,可强制转换为UploadNews 对象
+	 * @return 
+	 */;
+
+	/**
+	 * 根据标签进行群发图文消息
+	 * @param accessToken  授权token
+	 * @param tagId  标签
+	 * @param mediaId uploadMedia方法获得
+	 * @return 
 	 */
-	public WechatResult uploadnews(String accessToken, String path, List<UploadNews> entity);
-	
+	public MassMsgResult sendMpnewsToTag(String accessToken, int tagId, String mediaId);
 	
 	/**
-	 * 通过openid 群发 图文消息
-	 * @param list		待接收消息的openid 集合
-	 * @param mediaId	图文消息的id
-	 * @return 			MsgResult 对象
+	 * 根据标签进行群发图片
+	 * @param accessToken  授权token
+	 * @param tagId  标签
+	 * @param mediaId uploadMedia方法获得
+	 * @return 
 	 */
-	public MsgResult sendByOpenIdOfNews(String accessToken,List<String> list,String mediaId,String url);
+	public MassMsgResult sendImageToTag(String accessToken, int tagId, String mediaId);
 	
 	/**
-	 * 通过 openid 群发文字消息
-	 * @param accessToken	授权token
-	 * @param list			待接口消息的openId 集合
-	 * @param content		需要发送的文本内容
-	 * @return    MsgResult
+	 * 根据标签进行群发语音/音频
+	 * @param accessToken  授权token
+	 * @param tagId  标签
+	 * @param mediaId uploadMedia方法获得
+	 * @return 
 	 */
-	public MsgResult sendByOpenIdOfText(String accessToken,List<String> list,String url,String content);
+	public MassMsgResult sendVoiceToTag(String accessToken, int tagId, String mediaId);
+	
+	/**
+	 * 根据标签进行群发视频
+	 * @param accessToken  授权token
+	 * @param tagId  标签
+	 * @param mediaId uploadMedia方法获得
+	 * @return 
+	 */
+	public MassMsgResult sendVideoToTag(String accessToken, int tagId, String mediaId);
+	
+	/**
+	 * 根据标签进行群发卡券
+	 * @param accessToken  授权token
+	 * @param tagId  标签
+	 * @param card_id
+	 * @return 
+	 */
+	public MassMsgResult sendWxCardToTag(String accessToken, int tagId, String cardId);
+	
+	/**
+	 * 根据OpenId进行群发图文消息
+	 * @param accessToken  授权token
+	 * @param tagId  标签
+	 * @param mediaId uploadMedia方法获得
+	 * @return 
+	 */
+	public MassMsgResult sendMpnewsToOpenid(String accessToken, List<String> openids, String mediaId);
+	
+	/**
+	 * 根据OpenId进行群发文本消息
+	 * @param accessToken  授权token
+	 * @param openids  openid
+	 * @param content
+	 * @return 
+	 */
+	public MassMsgResult sendTextToOpenid(String accessToken, List<String> openids, String content);
+	
+	/**
+	 * 根据OpenId进行群发语音消息
+	 * @param accessToken  授权token
+	 * @param openids  openid
+	 * @param mediaId
+	 * @return 
+	 */
+	public MassMsgResult sendVocieToOpenid(String accessToken, List<String> openids, String mediaId);
+
+	/**
+	 * 根据OpenId进行群发图片消息
+	 * @param accessToken  授权token
+	 * @param openids  openid
+	 * @param mediaId
+	 * @return 
+	 */
+	public MassMsgResult sendImageToOpenid(String accessToken, List<String> openids, String mediaId);
+	
+	/**
+	 * 根据OpenId进行群发视频消息
+	 * @param accessToken  授权token
+	 * @param openids  openid
+	 * @param mpVideoMedia uploadMediaVideo方法获得media
+	 * @return 
+	 */
+	public MassMsgResult sendVideoToOpenid(String accessToken, List<String> openids, MpVideoMedia mpVideoMedia);
+	
+	/**
+	 * 根据OpenId进行群发卡券消息
+	 * @param accessToken  授权token
+	 * @param openids  openid
+	 * @param mediaId
+	 * @return 
+	 */
+	public MassMsgResult sendWxcardToOpenid(String accessToken, List<String> openids, String cardId);
 
 }

@@ -42,9 +42,9 @@ import org.apache.commons.lang3.StringUtils;
 import com.phil.modules.config.SystemConfig;
 import com.phil.modules.config.WechatConfig;
 import com.phil.wechat.base.result.WechatResult;
-import com.phil.wechat.msg.model.media.UploadNews;
-import com.phil.wechat.msg.model.media.UploadnewsResult;
-import com.phil.wechat.msg.model.resp.UploadMediasResult;
+import com.phil.wechat.msg.model.media.MpVideoMedia;
+import com.phil.wechat.msg.model.media.UploadMediasResult;
+import com.phil.wechat.msg.model.media.UploadNewsMedia;
 
 /**
  * Http连接工具类
@@ -542,41 +542,6 @@ public class HttpReqUtil {
 		}
 		return ip;
 	}
-	
-	/**
-	 * 上传图文消息的素材
-	 * 
-	 * @param accessToken  授权token
-	 * @param entity  图文消息对象
-	 * @return   result.isSuccess 则返回成功信息,可强制转换为UploadNews 对象
-	 */
-	public static UploadnewsResult uploadNewsMedia(String accessToken, List<UploadNews> entity) {
-		UploadnewsResult resultObj = null;
-		// url 的参数
-		TreeMap<String, String> params = new TreeMap<>();
-		params.put("access_token", accessToken);
-		// post 提交的参数
-		TreeMap<String, List<UploadNews>> dataParams = new TreeMap<>();
-		dataParams.put("articles", entity);
-		String data = JsonUtil.toJsonString(dataParams);
-		String result = HttpsDefaultExecute(SystemConfig.POST_METHOD, WechatConfig.UPLOAD_NEWS_MEDIA_URL, params, data);
-		resultObj = JsonUtil.fromJsonString(result, UploadnewsResult.class);		//转换数据
-		return resultObj;
-	}
-
-	/**
-	 * 上传视频,获取对应的media_id  注意此时的media与基础的media不一致
-	 * @param accessToken
-	 * @return	UploadNews
-	 */
-	public UploadnewsResult uploadVideo(String accessToken, String url, String data) {
-		UploadnewsResult state = null;
-		TreeMap<String, String> params = new TreeMap<>();
-		params.put("access_token", accessToken);
-		String result = HttpsDefaultExecute(SystemConfig.POST_METHOD, "uploadVideoPath", params, data);
-		state = JsonUtil.fromJsonString(result,UploadnewsResult.class);
-		return state;
-	}
 
 	/**
 	 * 上传临时素材(本地)
@@ -630,6 +595,117 @@ public class HttpReqUtil {
 	}
 
 	/**
+	 * 上传永久素材(本地)
+	 * 
+	 * @param accessToken
+	 * @param type
+	 *            媒体文件类型，分别有图片（image）、语音（voice）、视频（video）和缩略图（thumb）
+	 * @return
+	 */
+	public static UploadMediasResult uploadForeverMediaFile(String accessToken, String type, String path) {
+		UploadMediasResult result = null;
+		TreeMap<String, String> params = new TreeMap<>();
+		params.put("access_token", accessToken);
+		params.put("type", type);
+		try {
+			String json = HttpsUploadMediaFile(SystemConfig.POST_METHOD, WechatConfig.UPLOAD_FOREVER_MEDIA_TYPE_URL,
+					params, path);
+			result = JsonUtil.fromJsonString(json, UploadMediasResult.class);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+
+	/**
+	 * 上传永久素材(网络)
+	 * 
+	 * @param accessToken
+	 * @param type
+	 *            媒体文件类型，分别有图片（image）、语音（voice）、视频（video）和缩略图（thumb）
+	 * @return
+	 */
+	public static UploadMediasResult uploadForeverMedia(String accessToken, String type, String path) {
+		UploadMediasResult result = null;
+		TreeMap<String, String> params = new TreeMap<>();
+		params.put("access_token", accessToken);
+		params.put("type", type);
+		try {
+			String json = HttpsUploadMedia(SystemConfig.POST_METHOD, WechatConfig.UPLOAD_FOREVER_MEDIA_TYPE_URL, params,
+					path, 0, 0);
+			result = JsonUtil.fromJsonString(json, UploadMediasResult.class);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+
+	/**
+	 * 上传永久素材(video)
+	 * 
+	 * @param accessToken
+	 * @return
+	 */
+	public static String uploadForeverMediaFile(String accessToken, String title, String introduction, String path) {
+		TreeMap<String, String> params = new TreeMap<>();
+		params.put("access_token", accessToken);
+		params.put("type", "video");
+		String mediaId = null;
+		try {
+			String json = HttpsUploadVideoMediaFile(SystemConfig.POST_METHOD,
+					WechatConfig.UPLOAD_FOREVER_MEDIA_TYPE_URL, params, path, title, introduction);
+			mediaId = JsonUtil.fromJsonString(json, "media_id");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return mediaId;
+	}
+
+	/**
+	 * 上传永久素材(video,网络)
+	 * 
+	 * @param accessToken
+	 * @return
+	 */
+	public static String uploadForeverMedia(String accessToken, String title, String introduction, String path) {
+		TreeMap<String, String> params = new TreeMap<>();
+		params.put("access_token", accessToken);
+		params.put("type", "video");
+		String mediaId = null;
+		try {
+			String json = HttpsUploadVideoMedia(SystemConfig.POST_METHOD, WechatConfig.UPLOAD_FOREVER_MEDIA_TYPE_URL,
+					params, path, title, introduction, 0, 0);
+			mediaId = JsonUtil.fromJsonString(json, "media_id");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return mediaId;
+	}
+
+	/**
+	 * 上传永久图文消息的素材
+	 * 
+	 * @param accessToken
+	 *            授权token
+	 * @param entity
+	 *            图文消息对象
+	 * @return
+	 */
+	public static UploadMediasResult uploadNewsMedia(String accessToken, List<UploadNewsMedia> entity) {
+		UploadMediasResult result = null;
+		TreeMap<String, String> params = new TreeMap<>();
+		params.put("access_token", accessToken);
+		// post 提交的参数
+		TreeMap<String, List<UploadNewsMedia>> dataParams = new TreeMap<String, List<UploadNewsMedia>>();
+		dataParams.put("articles", entity);
+		String data = JsonUtil.toJsonString(dataParams);
+		String json = HttpReqUtil.HttpsDefaultExecute(SystemConfig.POST_METHOD,
+				WechatConfig.UPLOAD_FOREVER_NEWS_MEDIA_URL, params, data);
+		result = JsonUtil.fromJsonString(json, UploadMediasResult.class);
+		return result;
+	}
+
+	/**
 	 * 上传图文消息内的图片获取URL(本地)
 	 * 
 	 * @param accessToken
@@ -648,7 +724,6 @@ public class HttpReqUtil {
 			e.printStackTrace();
 		}
 		return url;
-
 	}
 
 	/**
@@ -659,7 +734,7 @@ public class HttpReqUtil {
 	 * @return
 	 */
 	public static String uploadImgMedia(String accessToken, String path) {
-		TreeMap<String, String> params = new TreeMap<>();
+		TreeMap<String, String> params = new TreeMap<String, String>();
 		params.put("access_token", accessToken);
 		String url = null;
 		try {
@@ -670,6 +745,25 @@ public class HttpReqUtil {
 			e.printStackTrace();
 		}
 		return url;
+	}
+
+	/**
+	 * 获取群发视频post中的media_id
+	 * 
+	 * @param accessToken
+	 * @param uploadVideo
+	 * @return
+	 */
+	public static UploadMediasResult uploadMediaVideo(String accessToken, MpVideoMedia mpVideoMedia) {
+		UploadMediasResult result = null;
+		TreeMap<String, String> params = new TreeMap<String, String>();
+		params.put("access_token", accessToken);
+		// post 提交的参数
+		String data = JsonUtil.toJsonString(mpVideoMedia);
+		String json = HttpReqUtil.HttpsDefaultExecute(SystemConfig.POST_METHOD, WechatConfig.UPLOAD_VIDEO_MEDIA_URL,
+				params, data);
+		result = JsonUtil.fromJsonString(json, UploadMediasResult.class);
+		return result;
 	}
 
 	/**
