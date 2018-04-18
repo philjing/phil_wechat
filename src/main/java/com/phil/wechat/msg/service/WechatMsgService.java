@@ -182,7 +182,8 @@ public interface WechatMsgService {
 	 * @param accessToken  授权token
 	 * @param entity  图文消息对象
 	 * @return 
-	 */;
+	 */
+	public MassMsgResult sendTextToTag(String accessToken, int tagId, String content);
 
 	/**
 	 * 根据标签进行群发图文消息
