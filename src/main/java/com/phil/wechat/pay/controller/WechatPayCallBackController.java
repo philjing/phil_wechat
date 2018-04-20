@@ -9,13 +9,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.phil.modules.config.SystemConfig;
 import com.phil.modules.config.WechatConfig;
+import com.phil.modules.constant.SystemConstant;
 import com.phil.modules.util.HttpReqUtil;
 import com.phil.modules.util.PayUtil;
 import com.phil.modules.util.SignatureUtil;
 import com.phil.modules.util.XmlUtil;
 import com.phil.wechat.base.controller.BaseController;
+import com.phil.wechat.pay.constant.PayConstant;
 import com.phil.wechat.pay.model.rep.PayCallBackParams;
 import com.phil.wechat.pay.model.rep.UnifiedOrderParams;
 import com.phil.wechat.pay.model.resp.PayCallBackResult;
@@ -41,8 +42,8 @@ public class WechatPayCallBackController extends BaseController {
 		// logger.info("微信支付系统发送的数据"+xml);
 		/**** 微信支付系统发送的数据其实就是回调地址输入的参数Xml ****/
 		// 验证签名
-		if (SignatureUtil.checkIsSignValidFromWeiXin(xml, WechatConfig.API_KEY,
-				SystemConfig.DEFAULT_CHARACTER_ENCODING)) {
+		if (SignatureUtil.checkIsSignValidFromWeiXin(xml, PayConstant.API_KEY,
+				SystemConstant.DEFAULT_CHARACTER_ENCODING)) {
 			// 转换成输入参数，
 			PayCallBackParams payCallBackParams = XmlUtil.getObjectFromXML(xml, PayCallBackParams.class);
 			// appid openid mch_id is_subscribe nonce_str product_id sign
@@ -59,7 +60,7 @@ public class WechatPayCallBackController extends BaseController {
 			// 组装统一下单的请求参数
 			UnifiedOrderParams unifiedOrderParams = new UnifiedOrderParams();
 			unifiedOrderParams.setAppid(WechatConfig.APP_ID);// 必须
-			unifiedOrderParams.setMch_id(WechatConfig.MCH_ID);// 必须
+			unifiedOrderParams.setMch_id(PayConstant.MCH_ID);// 必须
 			unifiedOrderParams.setOut_trade_no(out_trade_no);
 			unifiedOrderParams.setBody(body);
 			unifiedOrderParams.setAttach(attach);
@@ -70,17 +71,17 @@ public class WechatPayCallBackController extends BaseController {
 			unifiedOrderParams.setOpenid(openid);
 			unifiedOrderParams.setNotify_url(WechatConfig.NOTIFY_URL); // 异步通知URL
 			// 签名
-			String sign = SignatureUtil.createSign(unifiedOrderParams, WechatConfig.API_KEY,
-					SystemConfig.DEFAULT_CHARACTER_ENCODING);
+			String sign = SignatureUtil.createSign(unifiedOrderParams, PayConstant.API_KEY,
+					SystemConstant.DEFAULT_CHARACTER_ENCODING);
 			unifiedOrderParams.setSign(sign);
 			// 统一下单 请求的Xml
 			String unifiedXmL = XmlUtil.toSplitXml(unifiedOrderParams);
 			// 统一下单 返回的xml
-			String unifiedOrderResultXmL = HttpReqUtil.HttpsDefaultExecute(SystemConfig.POST_METHOD,
+			String unifiedOrderResultXmL = HttpReqUtil.HttpsDefaultExecute(SystemConstant.POST_METHOD,
 					WechatConfig.UNIFIED_ORDER_URL, null, unifiedXmL);
 			// 统一下单返回 验证签名
-			if (SignatureUtil.checkIsSignValidFromWeiXin(unifiedOrderResultXmL, WechatConfig.API_KEY,
-					SystemConfig.DEFAULT_CHARACTER_ENCODING)) {
+			if (SignatureUtil.checkIsSignValidFromWeiXin(unifiedOrderResultXmL, PayConstant.API_KEY,
+					SystemConstant.DEFAULT_CHARACTER_ENCODING)) {
 				UnifiedOrderResult unifiedOrderResult = (UnifiedOrderResult) XmlUtil
 						.getObjectFromXML(unifiedOrderResultXmL, UnifiedOrderResult.class);
 				if (Objects.equals("SUCCESS", unifiedOrderResult.getReturn_code())
@@ -88,13 +89,13 @@ public class WechatPayCallBackController extends BaseController {
 					PayCallBackResult payCallBackResult = new PayCallBackResult();
 					payCallBackResult.setReturn_code(unifiedOrderResult.getReturn_code());
 					payCallBackResult.setAppid(WechatConfig.APP_ID);
-					payCallBackResult.setMch_id(WechatConfig.MCH_ID);
+					payCallBackResult.setMch_id(PayConstant.MCH_ID);
 					payCallBackResult.setNonce_str(unifiedOrderResult.getNonce_str());// 直接用微信返回的
 					/**** prepay_id 2小时内都有效，根据product_id再次支付方法自己写 ****/
 					payCallBackResult.setPrepay_id(unifiedOrderResult.getPrepay_id());
 					payCallBackResult.setResult_code(unifiedOrderResult.getResult_code());
-					String callsign = SignatureUtil.createSign(payCallBackResult, WechatConfig.API_KEY,
-							SystemConfig.DEFAULT_CHARACTER_ENCODING);
+					String callsign = SignatureUtil.createSign(payCallBackResult, PayConstant.API_KEY,
+							SystemConstant.DEFAULT_CHARACTER_ENCODING);
 					payCallBackResult.setSign(callsign);
 					resXml = XmlUtil.toXml(payCallBackResult).replace("__", "_");
 					// 将数据包返回给微信支付系统处理

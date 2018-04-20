@@ -2,7 +2,6 @@ package com.phil.modules.util;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +10,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.FastDateFormat;
 
 public class ObjectUtil {
 	
@@ -246,7 +246,7 @@ public class ObjectUtil {
 		if (obj == null || !(obj instanceof java.util.Date)) {
 			return toString(obj, true);
 		}
-		return new SimpleDateFormat(fmt).format((java.util.Date) obj);
+		return FastDateFormat.getInstance(fmt).format((java.util.Date)obj);
 	}
 	
 	public static String parseEmailAddress(String old) {

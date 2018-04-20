@@ -1,14 +1,12 @@
 package com.phil.modules.util;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
-import java.util.Random;
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
-import com.phil.modules.config.SystemConfig;
+import com.phil.modules.constant.SystemConstant;
 
 /**
  * 支付的辅助工具类
@@ -27,9 +25,9 @@ public class PayUtil {
 	 */
 	public static int buildRandom(int length) {
 		int num = 1;
-		double random = Math.random();
+		double random = ThreadLocalRandom.current().nextDouble(); //Math.random();
 		if (random < 0.1) {
-			random = random + 0.1;
+			random += 0.1;
 		}
 		for (int i = 0; i < length; i++) {
 			num = num * 10;
@@ -43,8 +41,7 @@ public class PayUtil {
 	 * @return
 	 */
 	public static String createNonceStr() {
-		Random random = new Random();
-		return MD5Util.MD5Encode(String.valueOf(random.nextInt(10000)), SystemConfig.DEFAULT_CHARACTER_ENCODING);
+		return MD5Util.MD5Encode(String.valueOf(ThreadLocalRandom.current().nextInt(10000)), SystemConstant.DEFAULT_CHARACTER_ENCODING);
 	}
 
 	/**
@@ -53,8 +50,7 @@ public class PayUtil {
 	 * @return
 	 */
 	public static String createOutTradeNo() {
-		DateFormat df = new SimpleDateFormat("yyyyMMddHHmmssSSS");
-		return df.format(new Date()) + UUID.randomUUID().toString().hashCode();
+		return DateTimeUtil.formatDate(new Date(), "yyyyMMddHHmmssSSS") + UUID.randomUUID().toString().hashCode();
 	}
 
 	/**

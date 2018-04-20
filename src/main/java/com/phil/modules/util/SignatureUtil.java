@@ -18,17 +18,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
-import com.phil.modules.config.SystemConfig;
 import com.phil.modules.config.WechatConfig;
+import com.phil.modules.constant.SystemConstant;
+import com.phil.wechat.pay.constant.PayConstant;
 
 /**
  * 签名工具类
+ * 
  * @author phil
- * @date  2017年7月2日
+ * @date 2017年7月2日
  *
  */
 public class SignatureUtil {
-	
+
 	private static Logger logger = LoggerFactory.getLogger(SignatureUtil.class);
 
 	/**
@@ -94,9 +96,12 @@ public class SignatureUtil {
 	/**
 	 * 获取签名
 	 * 
-	 * @param o  待加密的对象 该处仅限于Class
-	 * @param apiKey 公众号key
-	 * @param characterEncoding 编码
+	 * @param o
+	 *            待加密的对象 该处仅限于Class
+	 * @param apiKey
+	 *            公众号key
+	 * @param characterEncoding
+	 *            编码
 	 * @return
 	 */
 	public static String createSign(Object o, String apiKey, String characterEncoding) {
@@ -108,8 +113,10 @@ public class SignatureUtil {
 	/**
 	 * 签名算法
 	 * 
-	 * @param o 要参与签名的数据对象
-	 * @param apiKey  API密匙
+	 * @param o
+	 *            要参与签名的数据对象
+	 * @param apiKey
+	 *            API密匙
 	 * @return 签名
 	 * @throws IllegalAccessException
 	 */
@@ -150,11 +157,13 @@ public class SignatureUtil {
 	 * @throws IllegalArgumentException
 	 * @throws IllegalAccessException
 	 */
-	private static ArrayList<String> getFieldList(Field[] array, Object object) throws IllegalArgumentException, IllegalAccessException {
+	private static ArrayList<String> getFieldList(Field[] array, Object object)
+			throws IllegalArgumentException, IllegalAccessException {
 		ArrayList<String> list = new ArrayList<String>();
 		for (Field f : array) {
 			f.setAccessible(true);
-			if (f.get(object) != null && f.get(object) != "" && !f.getName().equals("serialVersionUID") && !f.getName().equals("sign")) {
+			if (f.get(object) != null && f.get(object) != "" && !f.getName().equals("serialVersionUID")
+					&& !f.getName().equals("sign")) {
 				if (f.getName().equals("packageStr")) {
 					list.add("package" + "=" + f.get(object) + "&");
 				} else {
@@ -198,7 +207,8 @@ public class SignatureUtil {
 	/**
 	 * 通过Map<SortedMap,Object>中的所有元素参与签名
 	 * 
-	 * @param map 待参与签名的map集合
+	 * @param map
+	 *            待参与签名的map集合
 	 * @params apikey apikey中 如果为空则不参与签名，如果不为空则参与签名
 	 * @return
 	 */
@@ -216,6 +226,7 @@ public class SignatureUtil {
 		}
 		return result;
 	}
+
 	/**
 	 * 返回未加密的字符串
 	 * 
@@ -267,43 +278,48 @@ public class SignatureUtil {
 	/**
 	 * 从API返回的XML数据里面重新计算一次签名
 	 * 
-	 * @param responseString  API返回的XML数据
-	 * @param apiKey Key
+	 * @param responseString
+	 *            API返回的XML数据
+	 * @param apiKey
+	 *            Key
 	 * @return 新的签名
 	 * @throws ParserConfigurationException
 	 * @throws IOException
 	 * @throws SAXException
 	 */
-	public static String reCreateSign(String responseString, String apiKey, String characterEncoding) throws IOException, SAXException, ParserConfigurationException {
+	public static String reCreateSign(String responseString, String apiKey, String characterEncoding)
+			throws IOException, SAXException, ParserConfigurationException {
 		Map<String, Object> map = XmlUtil.parseXmlToMap(responseString);
 		// 清掉返回数据对象里面的Sign数据（不能把这个数据也加进去进行签名），然后用签名算法进行签名
 		map.put("sign", "");
 		// 将API返回的数据根据用签名算法进行计算新的签名，用来跟API返回的签名进行比较
 		return createSign(map, apiKey, characterEncoding);
 	}
-	
+
 	/**
-	 * (默认设置参数)
-	 * 检验API返回的数据里面的签名是否合法,规则是:按参数名称a-z排序,遇到空值的参数不参加签名
-	 * @param resultXml  API返回的XML数据字符串
+	 * (默认设置参数) 检验API返回的数据里面的签名是否合法,规则是:按参数名称a-z排序,遇到空值的参数不参加签名
+	 * 
+	 * @param resultXml
+	 *            API返回的XML数据字符串
 	 * @return API签名是否合法
 	 * @throws ParserConfigurationException
 	 * @throws IOException
 	 * @throws SAXException
 	 * @throws DocumentException
 	 */
-	public static boolean checkIsSignValidFromWeiXin(String checktXml) throws ParserConfigurationException, IOException, SAXException, DocumentException {
+	public static boolean checkIsSignValidFromWeiXin(String checktXml)
+			throws ParserConfigurationException, IOException, SAXException, DocumentException {
 		SortedMap<String, Object> map = XmlUtil.parseXmlToTreeMap(checktXml);
 		String signFromresultXml = (String) map.get("sign");
-		if(StringUtils.isEmpty(signFromresultXml)) {
+		if (StringUtils.isEmpty(signFromresultXml)) {
 			logger.debug("API返回的数据签名数据不存在");
 			return false;
 		}
-		logger.debug("服务器回包里面的签名{}" ,signFromresultXml);
+		logger.debug("服务器回包里面的签名{}", signFromresultXml);
 		// 清掉返回数据对象里面的Sign数据（不能把这个数据也加进去进行签名），然后用签名算法进行签名
 		map.put("sign", "");
 		// 将API返回的数据根据用签名算法进行计算新的签名，用来跟API返回的签名进行比较
-		String signForAPIResponse = createSign(map, WechatConfig.API_KEY, SystemConfig.DEFAULT_CHARACTER_ENCODING);
+		String signForAPIResponse = createSign(map, PayConstant.API_KEY, SystemConstant.DEFAULT_CHARACTER_ENCODING);
 		if (!signForAPIResponse.equals(signFromresultXml)) {
 			// 签名验不过，表示这个API返回的数据有可能已经被篡改了
 			logger.debug("API返回的数据签名验证不通过");
@@ -316,7 +332,8 @@ public class SignatureUtil {
 	/**
 	 * 检验API返回的数据里面的签名是否合法,规则是:按参数名称a-z排序,遇到空值的参数不参加签名
 	 * 
-	 * @param resultXml API返回的XML数据字符串
+	 * @param resultXml
+	 *            API返回的XML数据字符串
 	 * @param apiKey
 	 *            Key
 	 * @return API签名是否合法
@@ -325,14 +342,15 @@ public class SignatureUtil {
 	 * @throws SAXException
 	 * @throws DocumentException
 	 */
-	public static boolean checkIsSignValidFromWeiXin(String checktXml, String apiKey, String characterEncoding) throws ParserConfigurationException, IOException, SAXException, DocumentException {
+	public static boolean checkIsSignValidFromWeiXin(String checktXml, String apiKey, String characterEncoding)
+			throws ParserConfigurationException, IOException, SAXException, DocumentException {
 		SortedMap<String, Object> map = XmlUtil.parseXmlToTreeMap(checktXml);
 		String signFromresultXml = (String) map.get("sign");
-		if(StringUtils.isEmpty(signFromresultXml)) {
+		if (StringUtils.isEmpty(signFromresultXml)) {
 			logger.debug("API返回的数据签名数据不存在");
 			return false;
 		}
-		logger.debug("服务器回包里面的签名{}" ,signFromresultXml);
+		logger.debug("服务器回包里面的签名{}", signFromresultXml);
 		// 清掉返回数据对象里面的Sign数据（不能把这个数据也加进去进行签名），然后用签名算法进行签名
 		map.put("sign", "");
 		// 将API返回的数据根据用签名算法进行计算新的签名，用来跟API返回的签名进行比较

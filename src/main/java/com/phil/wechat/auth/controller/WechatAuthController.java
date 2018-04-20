@@ -12,8 +12,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.phil.modules.config.SystemConfig;
 import com.phil.modules.config.WechatConfig;
+import com.phil.modules.constant.SystemConstant;
 import com.phil.modules.util.DateTimeUtil;
 import com.phil.modules.util.MD5Util;
 import com.phil.modules.util.PayUtil;
@@ -32,16 +32,13 @@ import com.phil.wechat.base.controller.BaseController;
  *
  */
 @Controller
-@RequestMapping("api/auth")
+@RequestMapping("wxauth")
 public class WechatAuthController extends BaseController {
 
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
 	private WechatAuthService wechatAuthService;
-
-//	@Autowired
-//	private RedisTemplate<String, Object> redisTemplate;
 
 	/**
 	 * 获取地理位置
@@ -62,7 +59,7 @@ public class WechatAuthController extends BaseController {
 		params.put("noncestr", jssdkconfig.getNoncestr());
 		params.put("timestamp", jssdkconfig.getTimestamp());
 		params.put("url", this.getRequest().getRequestURL().toString());
-		String signature = SignatureUtil.createSha1Sign(params, null, SystemConfig.DEFAULT_CHARACTER_ENCODING);
+		String signature = SignatureUtil.createSha1Sign(params, null, SystemConstant.DEFAULT_CHARACTER_ENCODING);
 		jssdkconfig.setSignature(signature);
 		logger.debug("JsSDKConfig {}", jssdkconfig);
 		data.put("data", jssdkconfig);
@@ -78,6 +75,8 @@ public class WechatAuthController extends BaseController {
 	public String jsPay( ) throws Exception {  
 	    AuthAccessToken authAccessToken = null;  
 	    String code = this.getRequest().getParameter("code");
+//	    Optional<String> code_ = Optional.of(code);
+//	    return code_.orElse("error");
 	    if(StringUtils.isEmpty(code)){
 	    	return "error";
 	    }

@@ -11,8 +11,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.phil.modules.config.SystemConfig;
 import com.phil.modules.config.WechatConfig;
+import com.phil.modules.constant.SystemConstant;
 import com.phil.modules.util.DateTimeUtil;
 import com.phil.modules.util.HttpReqUtil;
 import com.phil.modules.util.JsonUtil;
@@ -130,7 +130,7 @@ public class WechatMsgServiceImpl implements WechatMsgService {
 		// TreeMap<String,String> map = new TreeMap<String,String>();
 		// map.put(city, value)
 		// map.put("map", HttpReqUtil.urlEncode(label,
-		// SystemConfig.CHARACTER_ENCODING));
+		// SystemConstant.CHARACTER_ENCODING));
 		// String xml = HttpReqUtil.HttpDefaultExecute(HttpReqUtil.GET_METHOD, url, map,
 		// "");
 		WechatResult result = new WechatResult();
@@ -379,7 +379,7 @@ public class WechatMsgServiceImpl implements WechatMsgService {
 		TemplateMsgResult templateMsgResult = null;
 		TreeMap<String, String> params = new TreeMap<>();
 		params.put("access_token", accessToken);
-		String result = HttpReqUtil.HttpsDefaultExecute(SystemConfig.POST_METHOD, WechatConfig.SEND_TEMPLATE_MESSAGE,
+		String result = HttpReqUtil.HttpsDefaultExecute(SystemConstant.POST_METHOD, WechatConfig.SEND_TEMPLATE_MESSAGE,
 				params, data);
 		templateMsgResult = JsonUtil.fromJsonString(result, TemplateMsgResult.class);
 		//log.....
@@ -392,6 +392,7 @@ public class WechatMsgServiceImpl implements WechatMsgService {
 	 * @param entity  图文消息对象
 	 * @return 
 	 */
+	@Override
 	public MassMsgResult sendTextToTag(String accessToken, int tagId, String content){
 		MassMsgResult result = null;
 		TreeMap<String, String> params = new TreeMap<>();
@@ -407,7 +408,7 @@ public class WechatMsgServiceImpl implements WechatMsgService {
 		dataParams.put("text", textParams);
 		dataParams.put("msgtype", "text");
 		String data = JsonUtil.toJsonString(dataParams);
-		String json = HttpReqUtil.HttpsDefaultExecute(SystemConfig.POST_METHOD, WechatConfig.SEND_ALL_MASS_MESSAGE_URL, params, data);
+		String json = HttpReqUtil.HttpsDefaultExecute(SystemConstant.POST_METHOD, WechatConfig.SEND_ALL_MASS_MESSAGE_URL, params, data);
 		try {
 			result = JsonUtil.fromJsonString(json, MassMsgResult.class);
 		} catch (Exception e) {
@@ -423,6 +424,7 @@ public class WechatMsgServiceImpl implements WechatMsgService {
 	 * @param mediaId uploadMedia方法获得
 	 * @return 
 	 */
+	@Override
 	public MassMsgResult sendMpnewsToTag(String accessToken, int tagId, String mediaId){
 		MassMsgResult result = null;
 		TreeMap<String, String> params = new TreeMap<>();
@@ -439,7 +441,7 @@ public class WechatMsgServiceImpl implements WechatMsgService {
 		dataParams.put("msgtype", "mpnews");
 		dataParams.put("send_ignore_reprint", 0);//不能省略
 		String data = JsonUtil.toJsonString(dataParams);
-		String json = HttpReqUtil.HttpsDefaultExecute(SystemConfig.POST_METHOD, WechatConfig.SEND_ALL_MASS_MESSAGE_URL, params, data);
+		String json = HttpReqUtil.HttpsDefaultExecute(SystemConstant.POST_METHOD, WechatConfig.SEND_ALL_MASS_MESSAGE_URL, params, data);
 		try {
 			result = JsonUtil.fromJsonString(json, MassMsgResult.class);
 		} catch (Exception e) {
@@ -455,6 +457,7 @@ public class WechatMsgServiceImpl implements WechatMsgService {
 	 * @param mediaId uploadMedia方法获得
 	 * @return 
 	 */
+	@Override
 	public MassMsgResult sendImageToTag(String accessToken, int tagId, String mediaId){
 		MassMsgResult result = null;
 		TreeMap<String, String> params = new TreeMap<>();
@@ -470,7 +473,7 @@ public class WechatMsgServiceImpl implements WechatMsgService {
 		dataParams.put("image", imageParams);
 		dataParams.put("msgtype", "image");
 		String data = JsonUtil.toJsonString(dataParams);
-		String json = HttpReqUtil.HttpsDefaultExecute(SystemConfig.POST_METHOD, WechatConfig.SEND_ALL_MASS_MESSAGE_URL, params, data);
+		String json = HttpReqUtil.HttpsDefaultExecute(SystemConstant.POST_METHOD, WechatConfig.SEND_ALL_MASS_MESSAGE_URL, params, data);
 		try {
 			result = JsonUtil.fromJsonString(json, MassMsgResult.class);
 		} catch (Exception e) {
@@ -486,6 +489,7 @@ public class WechatMsgServiceImpl implements WechatMsgService {
 	 * @param mediaId uploadMedia方法获得
 	 * @return 
 	 */
+	@Override
 	public MassMsgResult sendVoiceToTag(String accessToken, int tagId, String mediaId){
 		MassMsgResult result = null;
 		TreeMap<String, String> params = new TreeMap<>();
@@ -501,7 +505,7 @@ public class WechatMsgServiceImpl implements WechatMsgService {
 		dataParams.put("voice", voiceParams);
 		dataParams.put("msgtype", "voice");
 		String data = JsonUtil.toJsonString(dataParams);
-		String json = HttpReqUtil.HttpsDefaultExecute(SystemConfig.POST_METHOD, WechatConfig.SEND_ALL_MASS_MESSAGE_URL, params, data);
+		String json = HttpReqUtil.HttpsDefaultExecute(SystemConstant.POST_METHOD, WechatConfig.SEND_ALL_MASS_MESSAGE_URL, params, data);
 		try {
 			result = JsonUtil.fromJsonString(json, MassMsgResult.class);
 		} catch (Exception e) {
@@ -517,6 +521,7 @@ public class WechatMsgServiceImpl implements WechatMsgService {
 	 * @param mediaId uploadMedia方法获得
 	 * @return 
 	 */
+	@Override
 	public MassMsgResult sendVideoToTag(String accessToken, int tagId, String mediaId){
 		MassMsgResult result = null;
 		TreeMap<String, String> params = new TreeMap<>();
@@ -532,7 +537,7 @@ public class WechatMsgServiceImpl implements WechatMsgService {
 		dataParams.put("mpvideo", mpvideoParams);
 		dataParams.put("msgtype", "mpvideo");
 		String data = JsonUtil.toJsonString(dataParams);
-		String json = HttpReqUtil.HttpsDefaultExecute(SystemConfig.POST_METHOD, WechatConfig.SEND_ALL_MASS_MESSAGE_URL, params, data);
+		String json = HttpReqUtil.HttpsDefaultExecute(SystemConstant.POST_METHOD, WechatConfig.SEND_ALL_MASS_MESSAGE_URL, params, data);
 		try {
 			result = JsonUtil.fromJsonString(json, MassMsgResult.class);
 		} catch (Exception e) {
@@ -548,6 +553,7 @@ public class WechatMsgServiceImpl implements WechatMsgService {
 	 * @param card_id
 	 * @return 
 	 */
+	@Override
 	public MassMsgResult sendWxCardToTag(String accessToken, int tagId, String cardId){
 		MassMsgResult result = null;
 		TreeMap<String, String> params = new TreeMap<>();
@@ -563,7 +569,7 @@ public class WechatMsgServiceImpl implements WechatMsgService {
 		dataParams.put("wxcard", wxcardParams);
 		dataParams.put("msgtype", "wxcard");
 		String data = JsonUtil.toJsonString(dataParams);
-		String json = HttpReqUtil.HttpsDefaultExecute(SystemConfig.POST_METHOD, WechatConfig.SEND_ALL_MASS_MESSAGE_URL, params, data);
+		String json = HttpReqUtil.HttpsDefaultExecute(SystemConstant.POST_METHOD, WechatConfig.SEND_ALL_MASS_MESSAGE_URL, params, data);
 		try {
 			result = JsonUtil.fromJsonString(json, MassMsgResult.class);
 		} catch (Exception e) {
@@ -579,6 +585,7 @@ public class WechatMsgServiceImpl implements WechatMsgService {
 	 * @param mediaId uploadMedia方法获得
 	 * @return 
 	 */
+	@Override
 	public MassMsgResult sendMpnewsToOpenid(String accessToken, List<String> openids, String mediaId){
 		MassMsgResult result = null;
 		TreeMap<String, String> params = new TreeMap<>();
@@ -592,7 +599,7 @@ public class WechatMsgServiceImpl implements WechatMsgService {
 		dataParams.put("msgtype", "mpnews");
 		dataParams.put("send_ignore_reprint", 0);
 		String data = JsonUtil.toJsonString(dataParams);
-		String json = HttpReqUtil.HttpsDefaultExecute(SystemConfig.POST_METHOD, WechatConfig.SEND_MASS_MESSAGE_URL, params, data);
+		String json = HttpReqUtil.HttpsDefaultExecute(SystemConstant.POST_METHOD, WechatConfig.SEND_MASS_MESSAGE_URL, params, data);
 		try {
 			result = JsonUtil.fromJsonString(json, MassMsgResult.class);
 		} catch (Exception e) {
@@ -608,6 +615,7 @@ public class WechatMsgServiceImpl implements WechatMsgService {
 	 * @param content
 	 * @return 
 	 */
+	@Override
 	public MassMsgResult sendTextToOpenid(String accessToken, List<String> openids, String content){
 		MassMsgResult result = null;
 		TreeMap<String, String> params = new TreeMap<>();
@@ -621,7 +629,7 @@ public class WechatMsgServiceImpl implements WechatMsgService {
 		dataParams.put("msgtype", "text");
 		String data = JsonUtil.toJsonString(dataParams);
 		System.out.println(data);
-		String json = HttpReqUtil.HttpsDefaultExecute(SystemConfig.POST_METHOD, WechatConfig.SEND_MASS_MESSAGE_URL, params, data);
+		String json = HttpReqUtil.HttpsDefaultExecute(SystemConstant.POST_METHOD, WechatConfig.SEND_MASS_MESSAGE_URL, params, data);
 		try {
 			result = JsonUtil.fromJsonString(json, MassMsgResult.class);
 		} catch (Exception e) {
@@ -637,6 +645,7 @@ public class WechatMsgServiceImpl implements WechatMsgService {
 	 * @param mediaId
 	 * @return 
 	 */
+	@Override
 	public MassMsgResult sendVocieToOpenid(String accessToken, List<String> openids, String mediaId){
 		MassMsgResult result = null;
 		TreeMap<String, String> params = new TreeMap<>();
@@ -650,7 +659,7 @@ public class WechatMsgServiceImpl implements WechatMsgService {
 		dataParams.put("msgtype", "voice");
 		String data = JsonUtil.toJsonString(dataParams);
 		System.out.println(data);
-		String json = HttpReqUtil.HttpsDefaultExecute(SystemConfig.POST_METHOD, WechatConfig.SEND_MASS_MESSAGE_URL, params, data);
+		String json = HttpReqUtil.HttpsDefaultExecute(SystemConstant.POST_METHOD, WechatConfig.SEND_MASS_MESSAGE_URL, params, data);
 		try {
 			result = JsonUtil.fromJsonString(json, MassMsgResult.class);
 		} catch (Exception e) {
@@ -667,6 +676,7 @@ public class WechatMsgServiceImpl implements WechatMsgService {
 	 * @param mediaId
 	 * @return 
 	 */
+	@Override
 	public MassMsgResult sendImageToOpenid(String accessToken, List<String> openids, String mediaId){
 		MassMsgResult result = null;
 		TreeMap<String, String> params = new TreeMap<>();
@@ -680,7 +690,7 @@ public class WechatMsgServiceImpl implements WechatMsgService {
 		dataParams.put("msgtype", "image");
 		String data = JsonUtil.toJsonString(dataParams);
 		System.out.println(data);
-		String json = HttpReqUtil.HttpsDefaultExecute(SystemConfig.POST_METHOD, WechatConfig.SEND_MASS_MESSAGE_URL, params, data);
+		String json = HttpReqUtil.HttpsDefaultExecute(SystemConstant.POST_METHOD, WechatConfig.SEND_MASS_MESSAGE_URL, params, data);
 		try {
 			result = JsonUtil.fromJsonString(json, MassMsgResult.class);
 		} catch (Exception e) {
@@ -696,6 +706,7 @@ public class WechatMsgServiceImpl implements WechatMsgService {
 	 * @param mpVideoMedia uploadMediaVideo方法获得media
 	 * @return 
 	 */
+	@Override
 	public MassMsgResult sendVideoToOpenid(String accessToken, List<String> openids, MpVideoMedia mpVideoMedia){
 		MassMsgResult result = null;
 		TreeMap<String, String> params = new TreeMap<>();
@@ -707,7 +718,7 @@ public class WechatMsgServiceImpl implements WechatMsgService {
 		dataParams.put("msgtype", "mpvideo");
 		String data = JsonUtil.toJsonString(dataParams);
 		System.out.println(data);
-		String json = HttpReqUtil.HttpsDefaultExecute(SystemConfig.POST_METHOD, WechatConfig.SEND_MASS_MESSAGE_URL, params, data);
+		String json = HttpReqUtil.HttpsDefaultExecute(SystemConstant.POST_METHOD, WechatConfig.SEND_MASS_MESSAGE_URL, params, data);
 		try {
 			result = JsonUtil.fromJsonString(json, MassMsgResult.class);
 		} catch (Exception e) {
@@ -723,6 +734,7 @@ public class WechatMsgServiceImpl implements WechatMsgService {
 	 * @param mediaId
 	 * @return 
 	 */
+	@Override
 	public MassMsgResult sendWxcardToOpenid(String accessToken, List<String> openids, String cardId){
 		MassMsgResult result = null;
 		TreeMap<String, String> params = new TreeMap<>();
@@ -735,7 +747,7 @@ public class WechatMsgServiceImpl implements WechatMsgService {
 		dataParams.put("wxcard", wxcardParams);
 		dataParams.put("msgtype", "wxcard");
 		String data = JsonUtil.toJsonString(dataParams);
-		String json = HttpReqUtil.HttpsDefaultExecute(SystemConfig.POST_METHOD, WechatConfig.SEND_MASS_MESSAGE_URL, params, data);
+		String json = HttpReqUtil.HttpsDefaultExecute(SystemConstant.POST_METHOD, WechatConfig.SEND_MASS_MESSAGE_URL, params, data);
 		try {
 			result = JsonUtil.fromJsonString(json, MassMsgResult.class);
 		} catch (Exception e) {

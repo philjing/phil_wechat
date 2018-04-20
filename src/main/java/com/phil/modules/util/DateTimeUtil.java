@@ -1,7 +1,6 @@
 package com.phil.modules.util;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -12,10 +11,10 @@ import java.util.TimeZone;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.apache.commons.lang3.time.FastDateFormat;
 
 /**
- * 时间工具类
- * 
+ * 时间工具类 待重构
  * @author phil
  * @date 2017年7月20日
  *
@@ -26,75 +25,82 @@ public class DateTimeUtil {
 
 	public static final String YMDHMS_DATEFORMA = "yyyy-MM-dd HH:mm:ss";
 
-	public static String formatDate(long time, String style) {
-		Date date = new Date(time);
-		SimpleDateFormat outFormat = new SimpleDateFormat(style);
-		return outFormat.format(date);
+	// private static final ThreadLocal<SimpleDateFormat> local = new ThreadLocal<SimpleDateFormat>();
+
+	// private static Map<String, ThreadLocal<SimpleDateFormat>> local = new HashMap<String, ThreadLocal<SimpleDateFormat>>();
+
+	/**
+	 * 格式化日期
+	 * @param time
+	 * @param format
+	 * @return
+	 */
+	public static String formatDate(long time, String format) {
+		return FastDateFormat.getInstance(format).format(new Date(time));
 	}
 
+	/**
+	 * 格式化日期
+	 * @param date
+	 * @param format
+	 * @return
+	 */
 	public static String formatDate(Date date, String format) {
-		if (date == null)
+		if (date == null) {
 			return "";
-		SimpleDateFormat outFormat = new SimpleDateFormat(format);
-		return outFormat.format(date);
-	}
-
-	public static String formatDate(Date date) {
-		if (date == null)
-			return "";
-		SimpleDateFormat outFormat = new SimpleDateFormat("yyyy-MM-dd");
-		return outFormat.format(date);
-	}
-
-	public static String formatDateTime(Date date) {
-		SimpleDateFormat outFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		return outFormat.format(date);
-	}
-
-	public static String formatDate2(Date myDate) {
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd");
-		String strDate = formatter.format(myDate);
-		return strDate;
-	}
-
-	public static String formatDate3(Date myDate) {
-		SimpleDateFormat formatter = new SimpleDateFormat("MM-dd HH:mm");
-		String strDate = formatter.format(myDate);
-		return strDate;
-	}
-
-	public static String formatDate4(Date myDate) {
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
-		String strDate = formatter.format(myDate);
-		return strDate;
-	}
-
-	public static String formatDate5(Date myDate) {
-		String strDate = getYear(myDate) + "-" + getMonth(myDate) + "-" + getDay(myDate);
-		return strDate;
-	}
-
-	public static String formatDate6(Date myDate) {
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-		String strDate = formatter.format(myDate);
-		return strDate;
-	}
-
-	public static String formatDate7(Date myDate) {
-		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-		String strDate = formatter.format(myDate);
-		return strDate;
-	}
-
-	public static Date str2Date(String dt, String format) {
-		SimpleDateFormat df = new SimpleDateFormat(format);
-		Date date = null;
-		try {
-			date = df.parse(dt);
-			return date;
-		} catch (ParseException e) {
-			return date;
 		}
+		return FastDateFormat.getInstance(format).format(date);
+	}
+
+	/**
+	 * 转换时间
+	 * @param str
+	 * @param format
+	 * @return
+	 */
+	public static Date parseDate(String str, String format) {
+		try {
+			return DateUtils.parseDate(str, format);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
+	 * 取得给定的日期，不包含时间
+	 * @param date
+	 * @return
+	 */
+	public static Date getOnlyDate(Date date) {
+		if (date == null) {
+			return null;
+		}
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		cal.set(Calendar.HOUR, 0);
+		cal.set(Calendar.MINUTE, 0);
+		cal.set(Calendar.SECOND, 0);
+		cal.set(Calendar.MILLISECOND, 0);
+		return cal.getTime();
+	}
+
+	/**
+	 * 取得给定的日期，不包含时间
+	 * @param date
+	 * @return
+	 */
+	public static Date getOnlyDate24(Date date) {
+		if (date == null) {
+			return null;
+		}
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		cal.set(Calendar.HOUR_OF_DAY, 0);
+		cal.set(Calendar.MINUTE, 0);
+		cal.set(Calendar.SECOND, 0);
+		cal.set(Calendar.MILLISECOND, 0);
+		return cal.getTime();
 	}
 
 	public static int getHour() {
@@ -103,30 +109,21 @@ public class DateTimeUtil {
 		return cld.get(Calendar.HOUR_OF_DAY);
 	}
 
-	public static List<String> getYearList() {
-		List<String> yearList = new ArrayList<String>();
-		yearList.add(String.valueOf(getYear()));
-		yearList.add(String.valueOf(getYear() - 1));
-		yearList.add(String.valueOf(getYear() - 2));
-		return yearList;
-
-	}
-
-	public static Date addDays(Date date, int days) {
-		return DateUtils.addDays(date, days);
-	}
-
-	public static Date addYears(Date date, int years) {
-		return DateUtils.addYears(date, years);
-	}
-
-	public static Date addMonths(Date date, int months) {
-		return DateUtils.addMonths(date, months);
-	}
-
-	public static Date addWeeks(Date date, int weeks) {
-		return DateUtils.addWeeks(date, weeks);
-	}
+	// public static Date addDays(Date date, int days) {
+	// return DateUtils.addDays(date, days);
+	// }
+	//
+	// public static Date addYears(Date date, int years) {
+	// return DateUtils.addYears(date, years);
+	// }
+	//
+	// public static Date addMonths(Date date, int months) {
+	// return DateUtils.addMonths(date, months);
+	// }
+	//
+	// public static Date addWeeks(Date date, int weeks) {
+	// return DateUtils.addWeeks(date, weeks);
+	// }
 
 	public static Date getWeekStart() {
 		Calendar cal = new GregorianCalendar();
@@ -150,9 +147,7 @@ public class DateTimeUtil {
 	}
 
 	public static Date getYearStart() {
-
 		Calendar cal = new GregorianCalendar(getYear(), 0, 1);
-
 		return cal.getTime();
 	}
 
@@ -174,7 +169,6 @@ public class DateTimeUtil {
 	}
 
 	public static int getDaysOfmonth(int month, int year) {
-
 		int Dates = 0;
 		if (month < 0 || month > 12) {
 			System.out.println("month Error");
@@ -194,14 +188,11 @@ public class DateTimeUtil {
 		return Dates;
 	}
 
-	protected static SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
-
 	/**
 	 * HTTP date uses TimeZone GMT
 	 */
-	static {
-		format.setTimeZone(TimeZone.getTimeZone("GMT"));
-	}
+	protected static FastDateFormat format = FastDateFormat.getInstance("EEE, dd MMM yyyy HH:mm:ss zzz",
+			TimeZone.getTimeZone("GMT"), Locale.US);
 
 	public long getTime(String dateString) {
 		try {
@@ -212,15 +203,14 @@ public class DateTimeUtil {
 			try {
 				parsedDate = DateUtils.parseDate(dateString, new String[] { "yyyy/MM/dd", "yyyy.MM.dd HH:mm:ss",
 						"yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm", "yyyy年MM月dd日", "yyyy年MM月dd日HH", "yyyy年MM月dd日HH:mm",
-						"yyyy年MM月dd日HH:mm:ss", "yyyy年MM月dd日HH时", "yyyy年MM月dd日HH时mm分",
-						"yyyy年MM月dd日HH时mm分ss秒", "yyyyMMdd", "yyyyMMddHHmmss", "yyyyMMddHHmm", "yyyyMMddHH",
-						"MMM dd yyyy HH:mm:ss. zzz", "MMM dd yyyy HH:mm:ss zzz", "dd.MM.yyyy HH:mm:ss zzz",
-						"dd MM yyyy HH:mm:ss zzz", "dd.MM.yyyy; HH:mm:ss", "dd.MM.yyyy HH:mm:ss", "dd.MM.yyyy zzz",
-						"EEE MMM dd HH:mm:ss yyyy", "EEE MMM dd HH:mm:ss yyyy zzz", "EEE MMM dd HH:mm:ss zzz yyyy",
-						"EEE, MMM dd HH:mm:ss yyyy zzz", "EEE, dd MMM yyyy HH:mm:ss zzz",
-						"EEE,dd MMM yyyy HH:mm:ss zzz", "EEE, dd MMM yyyy HH:mm:sszzz", "EEE, dd MMM yyyy HH:mm:ss",
-						"EEE, dd-MMM-yy HH:mm:ss zzz", "yyyy/MM/dd HH:mm:ss.SSS zzz", "yyyy/MM/dd HH:mm:ss.SSS",
-						"yyyy/MM/dd HH:mm:ss", "yyyy/MM/dd HH:mm:ss zzz", });
+						"yyyy年MM月dd日HH:mm:ss", "yyyy年MM月dd日HH时", "yyyy年MM月dd日HH时mm分", "yyyy年MM月dd日HH时mm分ss秒",
+						"yyyyMMdd", "yyyyMMddHHmmss", "yyyyMMddHHmm", "yyyyMMddHH", "MMM dd yyyy HH:mm:ss. zzz",
+						"MMM dd yyyy HH:mm:ss zzz", "dd.MM.yyyy HH:mm:ss zzz", "dd MM yyyy HH:mm:ss zzz",
+						"dd.MM.yyyy; HH:mm:ss", "dd.MM.yyyy HH:mm:ss", "dd.MM.yyyy zzz", "EEE MMM dd HH:mm:ss yyyy",
+						"EEE MMM dd HH:mm:ss yyyy zzz", "EEE MMM dd HH:mm:ss zzz yyyy", "EEE, MMM dd HH:mm:ss yyyy zzz",
+						"EEE, dd MMM yyyy HH:mm:ss zzz", "EEE,dd MMM yyyy HH:mm:ss zzz", "EEE, dd MMM yyyy HH:mm:sszzz",
+						"EEE, dd MMM yyyy HH:mm:ss", "EEE, dd-MMM-yy HH:mm:ss zzz", "yyyy/MM/dd HH:mm:ss.SSS zzz",
+						"yyyy/MM/dd HH:mm:ss.SSS", "yyyy/MM/dd HH:mm:ss", "yyyy/MM/dd HH:mm:ss zzz", });
 				long result = parsedDate.getTime();
 				return result;
 			} catch (ParseException e) {
@@ -365,7 +355,6 @@ public class DateTimeUtil {
 	public static Date getQuarterEnd(int year, int quarter) {
 		Calendar calendar = Calendar.getInstance();
 		calendar.set(Calendar.YEAR, year);
-
 		if (quarter == 1) {
 			calendar.set(Calendar.MONTH, 2);
 			calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
@@ -387,27 +376,16 @@ public class DateTimeUtil {
 		return calendar.getTime();
 	}
 
-	public static Date Str2Date(String dt, String format) {
-		SimpleDateFormat df = new SimpleDateFormat(format);
-		Date date = null;
-		try {
-			date = df.parse(dt);
-			return date;
-		} catch (ParseException e) {
-			return date;
-		}
-	}
-
 	public static String getPrizeCurrTime() {
 		Date now = new Date();
-		SimpleDateFormat outFormat = new SimpleDateFormat("yyyy年MM月dd日 HH:mm");
+		FastDateFormat outFormat = FastDateFormat.getInstance("yyyy年MM月dd日 HH:mm");
 		String s = outFormat.format(now);
 		return s;
 	}
 
 	public static String getCurrTime() {
 		Date now = new Date();
-		SimpleDateFormat outFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+		FastDateFormat outFormat = FastDateFormat.getInstance("yyyyMMddHHmmss");
 		String s = outFormat.format(now);
 		return s;
 	}
@@ -575,69 +553,6 @@ public class DateTimeUtil {
 		return Dates;
 	}
 
-	public static Date getDate(Integer d, Integer m, Integer y) {
-		Calendar cld = Calendar.getInstance();
-		cld.set(y, m, d, 0, 0, 0);
-		return cld.getTime();
-	}
-
-	public static Date getDate(Integer d, Integer m, Integer y, Integer hh, Integer mm, Integer ss) {
-		Calendar cld = Calendar.getInstance();
-		cld.set(y, m, d, hh, mm, ss);
-		return cld.getTime();
-	}
-
-	public static boolean isWorkDayDefault(Date date) {
-		Calendar cld = Calendar.getInstance();
-		cld.setTime(date);
-		int dayOfweek = cld.get(Calendar.DAY_OF_WEEK);
-		if (dayOfweek == Calendar.SATURDAY || dayOfweek == Calendar.SUNDAY)
-			return false;
-		else
-			return true;
-	}
-
-	public static Date getDiff(Date date, int diff) {
-		Calendar cld = Calendar.getInstance();
-		cld.setTime(date);
-		cld.add(Calendar.DAY_OF_MONTH, diff);
-		Date newDate = cld.getTime();
-
-		return newDate;
-	}
-
-	public static Date getTodayStart() {
-		Date d = getDate(getDay(), getMonth() - 1, getYear());
-		return d;
-	}
-
-	public static Date getTodayEnd() {
-		Date d = getDate(getDay(), getMonth() - 1, getYear(), 23, 59, 59);
-		return d;
-	}
-
-	public static Date getTodayEnd(Date date) {
-
-		Date d = Str2Date(formatDate(date, "yyyy-MM-dd") + " 23:59:59", "yyyy-MM-dd HH:mm:ss");
-		return d;
-	}
-
-	public static Date getNow() {
-
-		return new Date();
-	}
-
-	public static Date getYesterdayEnd() {
-		Date d = getTodayEnd();
-		Date yd = getDiff(d, -1);
-		return yd;
-	}
-
-	public static Date getTommorowStart() {
-		Date d = getTodayStart();
-		return getDiff(d, 1);
-	}
-
 	public static List<String> getMonthStartAndEnd(Date fromDate, Date toDate) {
 		// 传入一个日期的时间段,返回"1/1/2008&31/1/2008";
 		List<String> list = new ArrayList<String>();
@@ -686,26 +601,6 @@ public class DateTimeUtil {
 		return list;
 	}
 
-	public static Date Str2Date1(String dateStr, String format) {
-
-		return getDiff(Str2Date(dateStr, format), 1);
-	}
-
-	// public static HashMap getFirstDayAndLastDayOfOneMonth(Date tempDate) {
-	// HashMap<String, Date> tempMap = new HashMap<String, Date>();
-	// Calendar ca = Calendar.getInstance();
-	// ca.setTime(tempDate); // 传入当月的一个日期
-	// ca.set(Calendar.DAY_OF_MONTH, 1);
-	// Date firstDate = ca.getTime();
-	// ca.add(Calendar.MONTH, 1);
-	// ca.add(Calendar.DAY_OF_MONTH, -1);
-	// Date lastDate = ca.getTime();
-	// tempMap.put("firstDate", firstDate);
-	// tempMap.put("lastDate", lastDate);
-	// return tempMap;
-	//
-	// }
-
 	public static long currentTime() {
 		return System.currentTimeMillis();
 	}
@@ -714,5 +609,4 @@ public class DateTimeUtil {
 		System.out.println(currentTime());
 		System.out.println(new Date().getTime());
 	}
-
 }

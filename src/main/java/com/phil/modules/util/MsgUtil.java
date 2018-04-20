@@ -1,7 +1,6 @@
 package com.phil.modules.util;
 
-import com.phil.modules.config.SystemConfig;
-import com.phil.modules.config.WechatConfig;
+import com.phil.modules.constant.SystemConstant;
 import com.phil.modules.util.XmlUtil.XStreamFactroy;
 import com.phil.wechat.msg.model.resp.RespAbstractMsg;
 import com.phil.wechat.msg.model.resp.RespImageMsg;
@@ -16,6 +15,7 @@ import com.phil.wechat.msg.model.resp.RespVideoMsg;
 import com.phil.wechat.msg.model.resp.RespVideoMsg.Video;
 import com.phil.wechat.msg.model.resp.RespVoiceMsg;
 import com.phil.wechat.msg.model.resp.RespVoiceMsg.Voice;
+import com.phil.wechat.pay.constant.PayConstant;
 import com.phil.wechat.pay.model.rep.AbstractPayParams;
 import com.thoughtworks.xstream.XStream;
 
@@ -151,7 +151,7 @@ public class MsgUtil {
 	 * @return
 	 */
 	public static String abstractPayToXml(AbstractPayParams params) {
-		String sign = SignatureUtil.createSign(params, WechatConfig.API_KEY, SystemConfig.DEFAULT_CHARACTER_ENCODING);
+		String sign = SignatureUtil.createSign(params, PayConstant.API_KEY, SystemConstant.DEFAULT_CHARACTER_ENCODING);
 		params.setSign(sign);
 		return XmlUtil.toSplitXml(params);
 	}

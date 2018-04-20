@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.xml.sax.SAXException;
 
-import com.phil.modules.config.SystemConfig;
 import com.phil.modules.config.WechatConfig;
+import com.phil.modules.constant.SystemConstant;
 import com.phil.modules.util.DateTimeUtil;
 import com.phil.modules.util.HttpReqUtil;
 import com.phil.modules.util.MsgUtil;
@@ -28,6 +28,7 @@ import com.phil.modules.util.PayUtil;
 import com.phil.modules.util.SignatureUtil;
 import com.phil.modules.util.XmlUtil;
 import com.phil.wechat.base.controller.BaseController;
+import com.phil.wechat.pay.constant.PayConstant;
 import com.phil.wechat.pay.model.rep.PayShortUrlParams;
 import com.phil.wechat.pay.model.rep.UnifiedOrderParams;
 import com.phil.wechat.pay.model.resp.JsPayResult;
@@ -81,7 +82,7 @@ public class WechatPayController extends BaseController {
 		// 参数组装
 		UnifiedOrderParams unifiedOrderParams = new UnifiedOrderParams();
 		unifiedOrderParams.setAppid(WechatConfig.APP_ID);// 必须
-		unifiedOrderParams.setMch_id(WechatConfig.MCH_ID);// 必须
+		unifiedOrderParams.setMch_id(PayConstant.MCH_ID);// 必须
 		unifiedOrderParams.setOut_trade_no(out_trade_no);// 必须
 		unifiedOrderParams.setBody(params.getBody());// 必须 微信支付-支付测试
 		unifiedOrderParams.setTotal_fee(params.getTotal_fee()); // 必须
@@ -93,7 +94,7 @@ public class WechatPayController extends BaseController {
 		// 统一下单 请求的Xml(正常的xml格式)
 		String unifiedXmL = MsgUtil.abstractPayToXml(unifiedOrderParams);// 签名并入util
 		// 返回<![CDATA[SUCCESS]]>格式的XML
-		String unifiedOrderResultXmL = HttpReqUtil.HttpsDefaultExecute(SystemConfig.POST_METHOD,
+		String unifiedOrderResultXmL = HttpReqUtil.HttpsDefaultExecute(SystemConstant.POST_METHOD,
 				WechatConfig.UNIFIED_ORDER_URL, null, unifiedXmL);
 		// 进行签名校验
 		try {
@@ -109,8 +110,8 @@ public class WechatPayController extends BaseController {
 				/**** prepay_id 2小时内都有效，再次支付方法自己重写 ****/
 				result.setPackageStr("prepay_id=" + unifiedOrderResult.getPrepay_id());
 				/**** 用对象进行签名 ****/
-				String paySign = SignatureUtil.createSign(result, WechatConfig.API_KEY,
-						SystemConfig.DEFAULT_CHARACTER_ENCODING);
+				String paySign = SignatureUtil.createSign(result, PayConstant.API_KEY,
+						SystemConstant.DEFAULT_CHARACTER_ENCODING);
 				result.setPaySign(paySign);
 				result.setResultCode(unifiedOrderResult.getResult_code());
 				data.put("code", 0);
@@ -142,27 +143,27 @@ public class WechatPayController extends BaseController {
 		// String product_id = "product_001"; // 推荐根据商品ID生成
 		TreeMap<String, Object> packageParams = new TreeMap<>();
 		packageParams.put("appid", WechatConfig.APP_ID);
-		packageParams.put("mch_id", WechatConfig.MCH_ID);
+		packageParams.put("mch_id", PayConstant.MCH_ID);
 		packageParams.put("product_id", productId);
 		packageParams.put("time_stamp", PayUtil.createTimeStamp());
 		packageParams.put("nonce_str", nonce_str);
 		String str_url = PayUtil.createPayImageUrl(packageParams);
-		String sign = SignatureUtil.createSign(packageParams, WechatConfig.API_KEY,
-				SystemConfig.DEFAULT_CHARACTER_ENCODING);
+		String sign = SignatureUtil.createSign(packageParams, PayConstant.API_KEY,
+				SystemConstant.DEFAULT_CHARACTER_ENCODING);
 		packageParams.put("sign", sign);
 		String payurl = "weixin://wxpay/bizpayurl?sign=" + sign + str_url;
 		logger.debug("payurl is {}", payurl);
 		/**** 转成短链接 ****/
 		PayShortUrlParams payShortUrlParams = new PayShortUrlParams();
 		payShortUrlParams.setAppid(WechatConfig.APP_ID);
-		payShortUrlParams.setMch_id(WechatConfig.MCH_ID);
+		payShortUrlParams.setMch_id(PayConstant.MCH_ID);
 		payShortUrlParams.setLong_url(payurl);
 		payShortUrlParams.setNonce_str(nonce_str);
-		String urlSign = SignatureUtil.createSign(payShortUrlParams, WechatConfig.API_KEY,
-				SystemConfig.DEFAULT_CHARACTER_ENCODING);
+		String urlSign = SignatureUtil.createSign(payShortUrlParams, PayConstant.API_KEY,
+				SystemConstant.DEFAULT_CHARACTER_ENCODING);
 		payShortUrlParams.setSign(urlSign);
 		String longXml = XmlUtil.toSplitXml(payShortUrlParams);
-		String shortResult = HttpReqUtil.HttpsDefaultExecute(SystemConfig.POST_METHOD, WechatConfig.PAY_SHORT_URL, null,
+		String shortResult = HttpReqUtil.HttpsDefaultExecute(SystemConstant.POST_METHOD, WechatConfig.PAY_SHORT_URL, null,
 				longXml);
 		PayShortUrlResult payShortUrlResult = XmlUtil.getObjectFromXML(shortResult, PayShortUrlResult.class);
 		if (Objects.equals("SUCCESS", payShortUrlResult.getReturn_code())) {
@@ -194,7 +195,7 @@ public class WechatPayController extends BaseController {
 		String spbill_create_ip = HttpReqUtil.getRemortIP(this.getRequest()); // 获取IP
 		UnifiedOrderParams unifiedOrderParams = new UnifiedOrderParams();
 		unifiedOrderParams.setAppid(WechatConfig.APP_ID);// 必须
-		unifiedOrderParams.setMch_id(WechatConfig.MCH_ID);// 必须
+		unifiedOrderParams.setMch_id(PayConstant.MCH_ID);// 必须
 		unifiedOrderParams.setOut_trade_no(out_trade_no);
 		unifiedOrderParams.setBody(params.getBody());
 		unifiedOrderParams.setAttach(params.getAttach());
@@ -208,7 +209,7 @@ public class WechatPayController extends BaseController {
 		String unifiedXmL = MsgUtil.abstractPayToXml(unifiedOrderParams); // 签名并入util
 		// logger.debug("统一下单 请求的Xml"+unifiedXmL);
 		// 统一下单 返回的xml(<![CDATA[product_001]]>格式)
-		String unifiedResultXmL = HttpReqUtil.HttpsDefaultExecute(SystemConfig.POST_METHOD,
+		String unifiedResultXmL = HttpReqUtil.HttpsDefaultExecute(SystemConstant.POST_METHOD,
 				WechatConfig.UNIFIED_ORDER_URL, null, unifiedXmL);
 		// logger.debug("统一下单 返回的xml("+unifiedResultXmL);
 		// 统一下单返回 验证签名

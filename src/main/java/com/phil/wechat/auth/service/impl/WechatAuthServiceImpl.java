@@ -9,8 +9,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.JsonSyntaxException;
-import com.phil.modules.config.SystemConfig;
 import com.phil.modules.config.WechatConfig;
+import com.phil.modules.constant.SystemConstant;
 import com.phil.modules.util.HttpReqUtil;
 import com.phil.modules.util.JsonUtil;
 import com.phil.wechat.auth.model.resp.AccessToken;
@@ -46,7 +46,7 @@ public class WechatAuthServiceImpl implements WechatAuthService {
 		map.put("grant_type", "client_credential");
 		map.put("appid", appid);
 		map.put("secret", secret);
-		String json = HttpReqUtil.HttpDefaultExecute(SystemConfig.GET_METHOD, WechatConfig.GET_ACCESS_TOKEN_URL, map,
+		String json = HttpReqUtil.HttpDefaultExecute(SystemConstant.GET_METHOD, WechatConfig.GET_ACCESS_TOKEN_URL, map,
 				"");
 		String result = null;
 		AccessToken accessToken = JsonUtil.fromJsonString(json, AccessToken.class);
@@ -84,7 +84,7 @@ public class WechatAuthServiceImpl implements WechatAuthService {
 			if (StringUtils.isEmpty(url)) {
 				url = WechatConfig.GET_OAUTH_TOKEN_URL;
 			}
-			String result = HttpReqUtil.HttpsDefaultExecute(SystemConfig.GET_METHOD, url, basic.getParams(), null);
+			String result = HttpReqUtil.HttpsDefaultExecute(SystemConstant.GET_METHOD, url, basic.getParams(), null);
 			authAccessToken = JsonUtil.fromJsonString(result, AuthAccessToken.class);
 		} catch (Exception e) {
 			logger.debug("error" + e.getMessage());
@@ -108,7 +108,7 @@ public class WechatAuthServiceImpl implements WechatAuthService {
 			if (StringUtils.isEmpty(url)) {
 				url = WechatConfig.REFRESH_OAUTH_TOKEN_URL;
 			}
-			String result = HttpReqUtil.HttpsDefaultExecute(SystemConfig.GET_METHOD, url, basic.getParams(), null);
+			String result = HttpReqUtil.HttpsDefaultExecute(SystemConstant.GET_METHOD, url, basic.getParams(), null);
 			authAccessToken = JsonUtil.fromJsonString(result, AuthAccessToken.class);
 		} catch (Exception e) {
 			logger.debug("error" + e.getMessage());
@@ -129,7 +129,7 @@ public class WechatAuthServiceImpl implements WechatAuthService {
 		Map<String, String> params = new TreeMap<>();
 		params.put("openid", openid);
 		params.put("access_token", accessToken);
-		String result = HttpReqUtil.HttpsDefaultExecute(SystemConfig.GET_METHOD, WechatConfig.SNS_USERINFO_URL, params,
+		String result = HttpReqUtil.HttpsDefaultExecute(SystemConstant.GET_METHOD, WechatConfig.SNS_USERINFO_URL, params,
 				null);
 		try {
 			authUserInfo = JsonUtil.fromJsonString(result, AuthUserInfo.class);
@@ -154,7 +154,7 @@ public class WechatAuthServiceImpl implements WechatAuthService {
 		Map<String, String> params = new TreeMap<>();
 		params.put("access_token", accessToken);
 		params.put("openid", openid);
-		String jsonResult = HttpReqUtil.HttpDefaultExecute(SystemConfig.GET_METHOD,
+		String jsonResult = HttpReqUtil.HttpDefaultExecute(SystemConstant.GET_METHOD,
 				WechatConfig.CHECK_SNS_AUTH_STATUS_URL, params, "");
 		state = JsonUtil.fromJsonString(jsonResult, ResultState.class);
 		return state;
@@ -170,7 +170,7 @@ public class WechatAuthServiceImpl implements WechatAuthService {
 		Map<String, String> params = new TreeMap<>();
 		params.put("access_token", accessToken);
 		params.put("type", "jsapi");
-		String result = HttpReqUtil.HttpDefaultExecute(SystemConfig.GET_METHOD, WechatConfig.GET_TICKET_URL, params,
+		String result = HttpReqUtil.HttpDefaultExecute(SystemConstant.GET_METHOD, WechatConfig.GET_TICKET_URL, params,
 				"");
 		jsapiTicket = JsonUtil.fromJsonString(result, JsapiTicket.class);
 		if (jsapiTicket.getErrcode() == 0) {

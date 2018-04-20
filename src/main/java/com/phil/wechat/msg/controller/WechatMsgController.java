@@ -17,7 +17,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.phil.modules.config.WechatConfig;
 import com.phil.modules.util.HttpReqUtil;
 import com.phil.modules.util.JsonUtil;
 import com.phil.modules.util.MsgUtil;
@@ -25,6 +24,7 @@ import com.phil.modules.util.SignatureUtil;
 import com.phil.modules.util.XmlUtil;
 import com.phil.wechat.base.controller.BaseController;
 import com.phil.wechat.base.result.WechatResult;
+import com.phil.wechat.msg.constant.MsgConstant;
 import com.phil.wechat.msg.model.media.UploadMediasResult;
 import com.phil.wechat.msg.model.media.UploadNewsMedia;
 import com.phil.wechat.msg.model.req.BasicMsg;
@@ -142,56 +142,56 @@ public class WechatMsgController extends BaseController {
 		String msgType = params.get("MsgType");
 		if (StringUtils.isEmpty(msgType)) {
 			switch (msgType) {
-			case WechatConfig.REQ_MESSAGE_TYPE_TEXT: // 文本消息
+			case MsgConstant.REQ_MESSAGE_TYPE_TEXT: // 文本消息
 				result = wechatMsgService.textMsg(msg, params);
 				break;
-			case WechatConfig.REQ_MESSAGE_TYPE_IMAGE: // 图片消息
+			case MsgConstant.REQ_MESSAGE_TYPE_IMAGE: // 图片消息
 				result = wechatMsgService.imageMsg(msg, params);
 				break;
-			case WechatConfig.REQ_MESSAGE_TYPE_LINK: // 链接消息
+			case MsgConstant.REQ_MESSAGE_TYPE_LINK: // 链接消息
 				result = wechatMsgService.linkMsg(msg, params);
 				break;
-			case WechatConfig.REQ_MESSAGE_TYPE_LOCATION: // 地理位置
+			case MsgConstant.REQ_MESSAGE_TYPE_LOCATION: // 地理位置
 				result = wechatMsgService.locationMsg(msg, params);
 				break;
-			case WechatConfig.REQ_MESSAGE_TYPE_VOICE: // 音频消息
+			case MsgConstant.REQ_MESSAGE_TYPE_VOICE: // 音频消息
 				result = wechatMsgService.voiceMsg(msg, params);
 				break;
-			case WechatConfig.REQ_MESSAGE_TYPE_SHORTVIDEO: // 短视频消息
+			case MsgConstant.REQ_MESSAGE_TYPE_SHORTVIDEO: // 短视频消息
 				result = wechatMsgService.shortvideo(msg, params);
 				break;
-			case WechatConfig.REQ_MESSAGE_TYPE_VIDEO: // 视频消息
+			case MsgConstant.REQ_MESSAGE_TYPE_VIDEO: // 视频消息
 				result = wechatMsgService.videoMsg(msg, params);
 				break;
-			case WechatConfig.REQ_MESSAGE_TYPE_EVENT: // 事件消息
+			case MsgConstant.REQ_MESSAGE_TYPE_EVENT: // 事件消息
 				String eventType = params.get("Event"); //
 				if (eventType != null && !"".equals(eventType)) {
 					switch (eventType) {
-					case WechatConfig.EVENT_TYPE_SUBSCRIBE:
+					case MsgConstant.EVENT_TYPE_SUBSCRIBE:
 						result = wechatMsgService.subscribe(msg, params);
 						break;
-					case WechatConfig.EVENT_TYPE_UNSUBSCRIBE:
+					case MsgConstant.EVENT_TYPE_UNSUBSCRIBE:
 						result = wechatMsgService.unsubscribe(msg, params);
 						break;
-					case WechatConfig.EVENT_TYPE_SCAN:
+					case MsgConstant.EVENT_TYPE_SCAN:
 						result = wechatMsgService.scan(msg, params);
 						break;
-					case WechatConfig.EVENT_TYPE_LOCATION:
+					case MsgConstant.EVENT_TYPE_LOCATION:
 						result = wechatMsgService.eventLocation(msg, params);
 						break;
-					case WechatConfig.EVENT_TYPE_CLICK:
+					case MsgConstant.EVENT_TYPE_CLICK:
 						result = wechatMsgService.eventClick(msg, params);
 						break;
-					case WechatConfig.EVENT_TYPE_VIEW:
+					case MsgConstant.EVENT_TYPE_VIEW:
 						result = wechatMsgService.eventView(msg, params);
 						break;
-					case WechatConfig.KF_CREATE_SESSION:
+					case MsgConstant.KF_CREATE_SESSION:
 						result = wechatMsgService.kfCreateSession(msg, params);
 						break;
-					case WechatConfig.KF_CLOSE_SESSION:
+					case MsgConstant.KF_CLOSE_SESSION:
 						result = wechatMsgService.kfCloseSession(msg, params);
 						break;
-					case WechatConfig.KF_SWITCH_SESSION:
+					case MsgConstant.KF_SWITCH_SESSION:
 						result = wechatMsgService.kfSwitchSession(msg, params);
 						break;
 					default:

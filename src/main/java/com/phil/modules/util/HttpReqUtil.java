@@ -39,8 +39,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import com.phil.modules.config.SystemConfig;
 import com.phil.modules.config.WechatConfig;
+import com.phil.modules.constant.SystemConstant;
 import com.phil.wechat.base.result.WechatResult;
 import com.phil.wechat.msg.model.media.MpVideoMedia;
 import com.phil.wechat.msg.model.media.UploadMediasResult;
@@ -84,7 +84,7 @@ public class HttpReqUtil {
 			conn.setReadTimeout(readTimeout == 0 ? DEFAULT_READTIME : readTimeout);
 			if (data != null && !"".equals(data)) {
 				OutputStream output = conn.getOutputStream();
-				output.write(data.getBytes(SystemConfig.DEFAULT_CHARACTER_ENCODING));
+				output.write(data.getBytes(SystemConstant.DEFAULT_CHARACTER_ENCODING));
 				output.flush();
 				output.close();
 			}
@@ -476,7 +476,7 @@ public class HttpReqUtil {
 		// if (inputStr != null && !inputStr.trim().equals("")) {
 		// try {
 		// byteArrayInputStream = new
-		// ByteArrayInputStream(sInputString.getBytes(SystemConfig.CHARACTER_ENCODING));
+		// ByteArrayInputStream(sInputString.getBytes(SystemConstant.CHARACTER_ENCODING));
 		// } catch (UnsupportedEncodingException e) {
 		// e.printStackTrace();
 		// }
@@ -484,7 +484,7 @@ public class HttpReqUtil {
 		if (StringUtils.isEmpty(inputStr)) {
 			return null;
 		}
-		return IOUtils.toInputStream(inputStr, SystemConfig.DEFAULT_CHARACTER_ENCODING); // IOUtils.toInputStream(inputStr);//不写好像是默认UTF-8
+		return IOUtils.toInputStream(inputStr, SystemConstant.DEFAULT_CHARACTER_ENCODING); // IOUtils.toInputStream(inputStr);//不写好像是默认UTF-8
 	}
 
 	/**
@@ -560,7 +560,7 @@ public class HttpReqUtil {
 		params.put("access_token", accessToken);
 		params.put("type", type);
 		try {
-			String json = HttpsUploadMediaFile(SystemConfig.POST_METHOD, WechatConfig.UPLOAD_TEMP_MEDIA_TYPE_URL,
+			String json = HttpsUploadMediaFile(SystemConstant.POST_METHOD, WechatConfig.UPLOAD_TEMP_MEDIA_TYPE_URL,
 					params, path);
 			result = JsonUtil.fromJsonString(json, UploadMediasResult.class);
 		} catch (Exception e) {
@@ -585,7 +585,7 @@ public class HttpReqUtil {
 		params.put("access_token", accessToken);
 		params.put("type", type);
 		try {
-			String json = HttpsUploadMedia(SystemConfig.POST_METHOD, WechatConfig.UPLOAD_TEMP_MEDIA_TYPE_URL, params,
+			String json = HttpsUploadMedia(SystemConstant.POST_METHOD, WechatConfig.UPLOAD_TEMP_MEDIA_TYPE_URL, params,
 					path, 0, 0);
 			result = JsonUtil.fromJsonString(json, UploadMediasResult.class);
 		} catch (Exception e) {
@@ -608,7 +608,7 @@ public class HttpReqUtil {
 		params.put("access_token", accessToken);
 		params.put("type", type);
 		try {
-			String json = HttpsUploadMediaFile(SystemConfig.POST_METHOD, WechatConfig.UPLOAD_FOREVER_MEDIA_TYPE_URL,
+			String json = HttpsUploadMediaFile(SystemConstant.POST_METHOD, WechatConfig.UPLOAD_FOREVER_MEDIA_TYPE_URL,
 					params, path);
 			result = JsonUtil.fromJsonString(json, UploadMediasResult.class);
 		} catch (Exception e) {
@@ -631,7 +631,7 @@ public class HttpReqUtil {
 		params.put("access_token", accessToken);
 		params.put("type", type);
 		try {
-			String json = HttpsUploadMedia(SystemConfig.POST_METHOD, WechatConfig.UPLOAD_FOREVER_MEDIA_TYPE_URL, params,
+			String json = HttpsUploadMedia(SystemConstant.POST_METHOD, WechatConfig.UPLOAD_FOREVER_MEDIA_TYPE_URL, params,
 					path, 0, 0);
 			result = JsonUtil.fromJsonString(json, UploadMediasResult.class);
 		} catch (Exception e) {
@@ -652,7 +652,7 @@ public class HttpReqUtil {
 		params.put("type", "video");
 		String mediaId = null;
 		try {
-			String json = HttpsUploadVideoMediaFile(SystemConfig.POST_METHOD,
+			String json = HttpsUploadVideoMediaFile(SystemConstant.POST_METHOD,
 					WechatConfig.UPLOAD_FOREVER_MEDIA_TYPE_URL, params, path, title, introduction);
 			mediaId = JsonUtil.fromJsonString(json, "media_id");
 		} catch (Exception e) {
@@ -673,7 +673,7 @@ public class HttpReqUtil {
 		params.put("type", "video");
 		String mediaId = null;
 		try {
-			String json = HttpsUploadVideoMedia(SystemConfig.POST_METHOD, WechatConfig.UPLOAD_FOREVER_MEDIA_TYPE_URL,
+			String json = HttpsUploadVideoMedia(SystemConstant.POST_METHOD, WechatConfig.UPLOAD_FOREVER_MEDIA_TYPE_URL,
 					params, path, title, introduction, 0, 0);
 			mediaId = JsonUtil.fromJsonString(json, "media_id");
 		} catch (Exception e) {
@@ -699,7 +699,7 @@ public class HttpReqUtil {
 		TreeMap<String, List<UploadNewsMedia>> dataParams = new TreeMap<String, List<UploadNewsMedia>>();
 		dataParams.put("articles", entity);
 		String data = JsonUtil.toJsonString(dataParams);
-		String json = HttpReqUtil.HttpsDefaultExecute(SystemConfig.POST_METHOD,
+		String json = HttpReqUtil.HttpsDefaultExecute(SystemConstant.POST_METHOD,
 				WechatConfig.UPLOAD_FOREVER_NEWS_MEDIA_URL, params, data);
 		result = JsonUtil.fromJsonString(json, UploadMediasResult.class);
 		return result;
@@ -717,7 +717,7 @@ public class HttpReqUtil {
 		params.put("access_token", accessToken);
 		String url = null;
 		try {
-			String json = HttpsUploadMediaFile(SystemConfig.POST_METHOD, WechatConfig.UPLOAD_IMG_MEDIA_URL, params,
+			String json = HttpsUploadMediaFile(SystemConstant.POST_METHOD, WechatConfig.UPLOAD_IMG_MEDIA_URL, params,
 					path);
 			url = JsonUtil.fromJsonString(json, "url");
 		} catch (Exception e) {
@@ -738,7 +738,7 @@ public class HttpReqUtil {
 		params.put("access_token", accessToken);
 		String url = null;
 		try {
-			String json = HttpsUploadMedia(SystemConfig.POST_METHOD, WechatConfig.UPLOAD_IMG_MEDIA_URL, params, path, 0,
+			String json = HttpsUploadMedia(SystemConstant.POST_METHOD, WechatConfig.UPLOAD_IMG_MEDIA_URL, params, path, 0,
 					0);
 			url = JsonUtil.fromJsonString(json, "url");
 		} catch (Exception e) {
@@ -760,7 +760,7 @@ public class HttpReqUtil {
 		params.put("access_token", accessToken);
 		// post 提交的参数
 		String data = JsonUtil.toJsonString(mpVideoMedia);
-		String json = HttpReqUtil.HttpsDefaultExecute(SystemConfig.POST_METHOD, WechatConfig.UPLOAD_VIDEO_MEDIA_URL,
+		String json = HttpReqUtil.HttpsDefaultExecute(SystemConstant.POST_METHOD, WechatConfig.UPLOAD_VIDEO_MEDIA_URL,
 				params, data);
 		result = JsonUtil.fromJsonString(json, UploadMediasResult.class);
 		return result;
@@ -795,21 +795,21 @@ public class HttpReqUtil {
 			con.setDoInput(true);
 			con.setDoOutput(true);
 			con.setUseCaches(false);
-			con.setRequestMethod(SystemConfig.POST_METHOD);
+			con.setRequestMethod(SystemConstant.POST_METHOD);
 			// 设置请求头信息
 			con.setRequestProperty("Connection", "Keep-Alive");
-			con.setRequestProperty("Charset", SystemConfig.DEFAULT_CHARACTER_ENCODING);
+			con.setRequestProperty("Charset", SystemConstant.DEFAULT_CHARACTER_ENCODING);
 			// 设置边界
 			String boundary = "----------" + System.currentTimeMillis();
 			con.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
 			// 请求正文信息
 			// 第一部分
 			output = new DataOutputStream(con.getOutputStream());
-			IOUtils.write(("--" + boundary + "\r\n").getBytes(SystemConfig.DEFAULT_CHARACTER_ENCODING), output);
+			IOUtils.write(("--" + boundary + "\r\n").getBytes(SystemConstant.DEFAULT_CHARACTER_ENCODING), output);
 			IOUtils.write(("Content-Disposition: form-data;name=\"media\"; filename=\"" + file.getName() + "\"\r\n")
-					.getBytes(SystemConfig.DEFAULT_CHARACTER_ENCODING), output);
+					.getBytes(SystemConstant.DEFAULT_CHARACTER_ENCODING), output);
 			IOUtils.write(
-					"Content-Type:application/octet-stream\r\n\r\n".getBytes(SystemConfig.DEFAULT_CHARACTER_ENCODING),
+					"Content-Type:application/octet-stream\r\n\r\n".getBytes(SystemConstant.DEFAULT_CHARACTER_ENCODING),
 					output);
 			// IOUtils.write(("Content-Type: "+ fileExt + "\r\n\r\n").getBytes(), output);
 			// 文件正文部分
@@ -817,7 +817,7 @@ public class HttpReqUtil {
 			inputStream = new DataInputStream(new FileInputStream(file));
 			IOUtils.copy(inputStream, output);
 			// 结尾部分
-			IOUtils.write(("\r\n--" + boundary + "--\r\n").getBytes(SystemConfig.DEFAULT_CHARACTER_ENCODING), output);
+			IOUtils.write(("\r\n--" + boundary + "--\r\n").getBytes(SystemConstant.DEFAULT_CHARACTER_ENCODING), output);
 			output.flush();
 			result = inputStreamToString(con.getInputStream());
 		} catch (MalformedURLException e) {
@@ -869,7 +869,7 @@ public class HttpReqUtil {
 				HttpURLConnection mediaConn = (HttpURLConnection) mediaUrl.openConnection();
 				mediaConn.setDoOutput(true);
 				mediaConn.setUseCaches(false);
-				mediaConn.setRequestMethod(SystemConfig.GET_METHOD);
+				mediaConn.setRequestMethod(SystemConstant.GET_METHOD);
 				mediaConn.setConnectTimeout(connTime == 0 ? DEFAULT_CONNTIME : connTime);
 				mediaConn.setReadTimeout(readTime == 0 ? DEFAULT_UPLOAD_READTIME : readTime);
 				String connType = mediaConn.getContentType();
@@ -932,17 +932,17 @@ public class HttpReqUtil {
 			con.setDoInput(true);
 			con.setDoOutput(true);
 			con.setUseCaches(false);
-			con.setRequestMethod(SystemConfig.POST_METHOD);
+			con.setRequestMethod(SystemConstant.POST_METHOD);
 			// 设置请求头信息
 			con.setRequestProperty("Connection", "Keep-Alive");
-			con.setRequestProperty("Charset", SystemConfig.DEFAULT_CHARACTER_ENCODING);
+			con.setRequestProperty("Charset", SystemConstant.DEFAULT_CHARACTER_ENCODING);
 			// 设置边界
 			String boundary = "----------" + System.currentTimeMillis();
 			con.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
 			// 请求正文信息
 			// 第一部分
 			output = new DataOutputStream(con.getOutputStream());
-			IOUtils.write(("--" + boundary + "\r\n").getBytes(SystemConfig.DEFAULT_CHARACTER_ENCODING), output);
+			IOUtils.write(("--" + boundary + "\r\n").getBytes(SystemConstant.DEFAULT_CHARACTER_ENCODING), output);
 			IOUtils.write(("Content-Disposition: form-data;name=\"media\"; filename=\"" + file.getName() + "\"\r\n")
 					.getBytes(), output);
 			IOUtils.write("Content-Type: video/mp4 \r\n\r\n".getBytes(), output);
@@ -951,12 +951,12 @@ public class HttpReqUtil {
 			inputStream = new DataInputStream(new FileInputStream(file));
 			IOUtils.copy(inputStream, output);
 			// 结尾部分
-			IOUtils.write(("--" + boundary + "\r\n").getBytes(SystemConfig.DEFAULT_CHARACTER_ENCODING), output);
+			IOUtils.write(("--" + boundary + "\r\n").getBytes(SystemConstant.DEFAULT_CHARACTER_ENCODING), output);
 			IOUtils.write("Content-Disposition: form-data; name=\"description\";\r\n\r\n"
-					.getBytes(SystemConfig.DEFAULT_CHARACTER_ENCODING), output);
+					.getBytes(SystemConstant.DEFAULT_CHARACTER_ENCODING), output);
 			IOUtils.write(("{\"title\":\"" + title + "\",\"introduction\":\"" + introduction + "\"}")
-					.getBytes(SystemConfig.DEFAULT_CHARACTER_ENCODING), output);
-			IOUtils.write(("\r\n--" + boundary + "--\r\n\r\n").getBytes(SystemConfig.DEFAULT_CHARACTER_ENCODING),
+					.getBytes(SystemConstant.DEFAULT_CHARACTER_ENCODING), output);
+			IOUtils.write(("\r\n--" + boundary + "--\r\n\r\n").getBytes(SystemConstant.DEFAULT_CHARACTER_ENCODING),
 					output);
 			output.flush();
 			result = inputStreamToString(con.getInputStream());
@@ -1013,7 +1013,7 @@ public class HttpReqUtil {
 				HttpURLConnection mediaConn = (HttpURLConnection) mediaUrl.openConnection();
 				mediaConn.setDoOutput(true);
 				mediaConn.setUseCaches(false);
-				mediaConn.setRequestMethod(SystemConfig.GET_METHOD);
+				mediaConn.setRequestMethod(SystemConstant.GET_METHOD);
 				mediaConn.setConnectTimeout(connTime == 0 ? DEFAULT_CONNTIME : connTime);
 				mediaConn.setReadTimeout(readTime == 0 ? DEFAULT_UPLOAD_READTIME : readTime);
 				IOUtils.write(("--" + boundary + "\r\n").getBytes(), output);
@@ -1023,12 +1023,12 @@ public class HttpReqUtil {
 				inputStream = new BufferedInputStream(mediaConn.getInputStream());
 				IOUtils.copy(inputStream, output);
 				// 结尾部分
-				IOUtils.write(("--" + boundary + "\r\n").getBytes(SystemConfig.DEFAULT_CHARACTER_ENCODING), output);
+				IOUtils.write(("--" + boundary + "\r\n").getBytes(SystemConstant.DEFAULT_CHARACTER_ENCODING), output);
 				IOUtils.write("Content-Disposition: form-data; name=\"description\";\r\n\r\n"
-						.getBytes(SystemConfig.DEFAULT_CHARACTER_ENCODING), output);
+						.getBytes(SystemConstant.DEFAULT_CHARACTER_ENCODING), output);
 				IOUtils.write(("{\"title\":\"" + title + "\",\"introduction\":\"" + introduction + "\"}")
-						.getBytes(SystemConfig.DEFAULT_CHARACTER_ENCODING), output);
-				IOUtils.write(("\r\n--" + boundary + "--\r\n\r\n").getBytes(SystemConfig.DEFAULT_CHARACTER_ENCODING),
+						.getBytes(SystemConstant.DEFAULT_CHARACTER_ENCODING), output);
+				IOUtils.write(("\r\n--" + boundary + "--\r\n\r\n").getBytes(SystemConstant.DEFAULT_CHARACTER_ENCODING),
 						output);
 				mediaConn.disconnect();
 				// 获取输入流
