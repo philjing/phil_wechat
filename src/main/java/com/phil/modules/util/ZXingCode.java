@@ -13,7 +13,6 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.zxing.BarcodeFormat;
@@ -178,8 +177,6 @@ public class ZXingCode {
 			return Base64.encodeBase64URLSafeString(baos.toByteArray());
 		} catch (Exception e) {
 			e.printStackTrace();
-		} finally {
-			IOUtils.closeQuietly(baos);
 		}
 		return null;
 	}

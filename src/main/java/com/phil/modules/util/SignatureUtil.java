@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import com.phil.modules.config.WechatConfig;
-import com.phil.modules.constant.SystemConstant;
 import com.phil.wechat.pay.constant.PayConstant;
 
 /**
@@ -104,9 +103,9 @@ public class SignatureUtil {
 	 *            编码
 	 * @return
 	 */
-	public static String createSign(Object o, String apiKey, String characterEncoding) {
+	public static String createSign(Object o, String apiKey, String encoding) {
 		String result = notSignParams(o, apiKey);
-		result = MD5Util.MD5Encode(result, characterEncoding).toUpperCase();
+		result = MD5Util.MD5Encode(result, encoding).toUpperCase();
 		return result;
 	}
 
@@ -287,13 +286,13 @@ public class SignatureUtil {
 	 * @throws IOException
 	 * @throws SAXException
 	 */
-	public static String reCreateSign(String responseString, String apiKey, String characterEncoding)
+	public static String reCreateSign(String responseString, String apiKey, String encoding)
 			throws IOException, SAXException, ParserConfigurationException {
-		Map<String, Object> map = XmlUtil.parseXmlToMap(responseString);
+		Map<String, Object> map = XmlUtil.parseXmlToMap(responseString, encoding);
 		// 清掉返回数据对象里面的Sign数据（不能把这个数据也加进去进行签名），然后用签名算法进行签名
 		map.put("sign", "");
 		// 将API返回的数据根据用签名算法进行计算新的签名，用来跟API返回的签名进行比较
-		return createSign(map, apiKey, characterEncoding);
+		return createSign(map, apiKey, encoding);
 	}
 
 	/**
@@ -307,9 +306,9 @@ public class SignatureUtil {
 	 * @throws SAXException
 	 * @throws DocumentException
 	 */
-	public static boolean checkIsSignValidFromWeiXin(String checktXml)
+	public static boolean checkIsSignValidFromWeiXin(String checktXml, String encoding)
 			throws ParserConfigurationException, IOException, SAXException, DocumentException {
-		SortedMap<String, Object> map = XmlUtil.parseXmlToTreeMap(checktXml);
+		SortedMap<String, Object> map = XmlUtil.parseXmlToTreeMap(checktXml, encoding);
 		String signFromresultXml = (String) map.get("sign");
 		if (StringUtils.isEmpty(signFromresultXml)) {
 			logger.debug("API返回的数据签名数据不存在");
@@ -319,7 +318,7 @@ public class SignatureUtil {
 		// 清掉返回数据对象里面的Sign数据（不能把这个数据也加进去进行签名），然后用签名算法进行签名
 		map.put("sign", "");
 		// 将API返回的数据根据用签名算法进行计算新的签名，用来跟API返回的签名进行比较
-		String signForAPIResponse = createSign(map, PayConstant.API_KEY, SystemConstant.DEFAULT_CHARACTER_ENCODING);
+		String signForAPIResponse = createSign(map, PayConstant.API_KEY, encoding);
 		if (!signForAPIResponse.equals(signFromresultXml)) {
 			// 签名验不过，表示这个API返回的数据有可能已经被篡改了
 			logger.debug("API返回的数据签名验证不通过");
@@ -342,9 +341,9 @@ public class SignatureUtil {
 	 * @throws SAXException
 	 * @throws DocumentException
 	 */
-	public static boolean checkIsSignValidFromWeiXin(String checktXml, String apiKey, String characterEncoding)
+	public static boolean checkIsSignValidFromWeiXin(String checktXml, String apiKey, String encoding)
 			throws ParserConfigurationException, IOException, SAXException, DocumentException {
-		SortedMap<String, Object> map = XmlUtil.parseXmlToTreeMap(checktXml);
+		SortedMap<String, Object> map = XmlUtil.parseXmlToTreeMap(checktXml,encoding);
 		String signFromresultXml = (String) map.get("sign");
 		if (StringUtils.isEmpty(signFromresultXml)) {
 			logger.debug("API返回的数据签名数据不存在");
@@ -354,7 +353,7 @@ public class SignatureUtil {
 		// 清掉返回数据对象里面的Sign数据（不能把这个数据也加进去进行签名），然后用签名算法进行签名
 		map.put("sign", "");
 		// 将API返回的数据根据用签名算法进行计算新的签名，用来跟API返回的签名进行比较
-		String signForAPIResponse = createSign(map, apiKey, characterEncoding);
+		String signForAPIResponse = createSign(map, apiKey, encoding);
 		if (!signForAPIResponse.equals(signFromresultXml)) {
 			// 签名验不过，表示这个API返回的数据有可能已经被篡改了
 			logger.debug("API返回的数据签名验证不通过");

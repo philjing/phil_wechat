@@ -3,13 +3,12 @@ package com.phil.wechat.pay.controller;
 import java.io.BufferedOutputStream;
 import java.util.Objects;
 
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.phil.modules.util.HttpReqUtil;
+import com.phil.modules.util.IOUtil;
 import com.phil.modules.util.SignatureUtil;
 import com.phil.modules.util.XmlUtil;
 import com.phil.wechat.base.controller.BaseController;
@@ -34,10 +33,10 @@ public class WechatPayNotifyController extends BaseController {
 		ResultState resultState = new ResultState();
 		logger.debug("开始处理支付返回的请求");
 		String resXml = ""; // 反馈给微信服务器
-		String notifyXml = HttpReqUtil.inputStreamToString(this.getRequest().getInputStream());// 微信支付系统发送的数据（<![CDATA[product_001]]>格式）
+		String notifyXml = IOUtil.inputStreamToString(this.getRequest().getInputStream(), null);// 微信支付系统发送的数据（<![CDATA[product_001]]>格式）
 		logger.debug("微信支付系统发送的数据" + notifyXml);
 		// 验证签名
-		if (SignatureUtil.checkIsSignValidFromWeiXin(notifyXml)) {
+		if (SignatureUtil.checkIsSignValidFromWeiXin(notifyXml, null)) {
 			PayNotifyResult notify = XmlUtil.getObjectFromXML(notifyXml, PayNotifyResult.class);
 			logger.debug("支付结果 {}", notify.toString());
 			if (Objects.equals("SUCCESS", notify.getResult_code())) {
@@ -68,8 +67,6 @@ public class WechatPayNotifyController extends BaseController {
 			out.flush();
 		} catch (Exception e) {
 			e.printStackTrace();
-		} finally {
-			IOUtils.closeQuietly(out);
 		}
 		return resultState;
 	}

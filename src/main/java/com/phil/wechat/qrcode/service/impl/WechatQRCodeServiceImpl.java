@@ -10,6 +10,7 @@ import com.google.gson.JsonSyntaxException;
 import com.phil.modules.config.WechatConfig;
 import com.phil.modules.constant.SystemConstant;
 import com.phil.modules.util.HttpReqUtil;
+import com.phil.modules.util.IOUtil;
 import com.phil.modules.util.JsonUtil;
 import com.phil.wechat.base.result.WechatResult;
 import com.phil.wechat.qrcode.constant.QRCodeConstant;
@@ -41,7 +42,7 @@ public class WechatQRCodeServiceImpl implements WechatQRCodeService{
 		paramsMap.put("action_name", QRCodeConstant.QR_SCENE);
 		paramsMap.put("action_info", mapMap);
 		String data = JsonUtil.toJsonString(paramsMap);
-		data = HttpReqUtil.HttpsDefaultExecute(SystemConstant.POST_METHOD, WechatConfig.CREATE_TICKET_PATH, params, data);
+		data = HttpReqUtil.HttpsDefaultExecute(SystemConstant.POST_METHOD, WechatConfig.CREATE_TICKET_PATH, params, data, null);
 		WechatQRCode wechatQRCode = null;
 		try {
 			wechatQRCode = JsonUtil.fromJsonString(data, WechatQRCode.class);
@@ -72,7 +73,7 @@ public class WechatQRCodeServiceImpl implements WechatQRCodeService{
 		paramsMap.put("action_name", QRCodeConstant.QR_LIMIT_SCENE);
 		paramsMap.put("action_info", mapMap);
 		String data = JsonUtil.toJsonString(paramsMap);
-		data = HttpReqUtil.HttpsDefaultExecute(SystemConstant.POST_METHOD, WechatConfig.CREATE_TICKET_PATH, params, data);
+		data = HttpReqUtil.HttpsDefaultExecute(SystemConstant.POST_METHOD, WechatConfig.CREATE_TICKET_PATH, params, data, null);
 		WechatQRCode wechatQRCode = null;
 		try {
 			wechatQRCode = JsonUtil.fromJsonString(data, WechatQRCode.class);
@@ -102,7 +103,7 @@ public class WechatQRCodeServiceImpl implements WechatQRCodeService{
 		paramsMap.put("action_name", QRCodeConstant.QR_LIMIT_STR_SCENE);
 		paramsMap.put("action_info", mapMap);
 		String data = JsonUtil.toJsonString(paramsMap);
-		data = HttpReqUtil.HttpsDefaultExecute(SystemConstant.POST_METHOD, WechatConfig.CREATE_TICKET_PATH, params, data);
+		data = HttpReqUtil.HttpsDefaultExecute(SystemConstant.POST_METHOD, WechatConfig.CREATE_TICKET_PATH, params, data, null);
 		WechatQRCode wechatQRCode = null;
 		try {
 			wechatQRCode = JsonUtil.fromJsonString(data, WechatQRCode.class);
@@ -134,12 +135,12 @@ public class WechatQRCodeServiceImpl implements WechatQRCodeService{
 	@Override
 	public WechatResult downshowQrcode(String ticket, String savePath) throws Exception {
 		return HttpReqUtil.downMeaterMetod(params(ticket), SystemConstant.GET_METHOD, WechatConfig.SHOW_QRCODE_PATH,
-				savePath);
+				savePath, null);
 	}
 
 	private TreeMap<String, String> params(String ticket) {
 		TreeMap<String, String> params = new TreeMap<>();
-		params.put("ticket", HttpReqUtil.urlEncode(ticket, SystemConstant.DEFAULT_CHARACTER_ENCODING));
+		params.put("ticket", IOUtil.urlEncode(ticket, SystemConstant.DEFAULT_CHARACTER_ENCODING));
 		return params;
 	}
 	
@@ -158,7 +159,7 @@ public class WechatQRCodeServiceImpl implements WechatQRCodeService{
 		paramsMap.put("long_url", longUrl);
 		String data = JsonUtil.toJsonString(paramsMap);
 		String result = HttpReqUtil.HttpsDefaultExecute(SystemConstant.POST_METHOD, WechatConfig.WECHAT_SHORT_QRCODE_URL,
-				params, data);
+				params, data, null);
 		WechatQRCodeShortUrl wechatQRCodeShortUrl = JsonUtil.fromJsonString(result, WechatQRCodeShortUrl.class);
 		return wechatQRCodeShortUrl.getShort_url();
 	}

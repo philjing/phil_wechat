@@ -95,10 +95,10 @@ public class WechatPayController extends BaseController {
 		String unifiedXmL = MsgUtil.abstractPayToXml(unifiedOrderParams);// 签名并入util
 		// 返回<![CDATA[SUCCESS]]>格式的XML
 		String unifiedOrderResultXmL = HttpReqUtil.HttpsDefaultExecute(SystemConstant.POST_METHOD,
-				WechatConfig.UNIFIED_ORDER_URL, null, unifiedXmL);
+				WechatConfig.UNIFIED_ORDER_URL, null, unifiedXmL, null);
 		// 进行签名校验
 		try {
-			if (SignatureUtil.checkIsSignValidFromWeiXin(unifiedOrderResultXmL)) {
+			if (SignatureUtil.checkIsSignValidFromWeiXin(unifiedOrderResultXmL, null)) {
 				String timeStamp = PayUtil.createTimeStamp();
 				// 统一下单响应
 				UnifiedOrderResult unifiedOrderResult = XmlUtil.getObjectFromXML(unifiedOrderResultXmL,
@@ -164,7 +164,7 @@ public class WechatPayController extends BaseController {
 		payShortUrlParams.setSign(urlSign);
 		String longXml = XmlUtil.toSplitXml(payShortUrlParams);
 		String shortResult = HttpReqUtil.HttpsDefaultExecute(SystemConstant.POST_METHOD, WechatConfig.PAY_SHORT_URL, null,
-				longXml);
+				longXml, null);
 		PayShortUrlResult payShortUrlResult = XmlUtil.getObjectFromXML(shortResult, PayShortUrlResult.class);
 		if (Objects.equals("SUCCESS", payShortUrlResult.getReturn_code())) {
 			payurl = payShortUrlResult.getShort_url();
@@ -210,10 +210,10 @@ public class WechatPayController extends BaseController {
 		// logger.debug("统一下单 请求的Xml"+unifiedXmL);
 		// 统一下单 返回的xml(<![CDATA[product_001]]>格式)
 		String unifiedResultXmL = HttpReqUtil.HttpsDefaultExecute(SystemConstant.POST_METHOD,
-				WechatConfig.UNIFIED_ORDER_URL, null, unifiedXmL);
+				WechatConfig.UNIFIED_ORDER_URL, null, unifiedXmL, null);
 		// logger.debug("统一下单 返回的xml("+unifiedResultXmL);
 		// 统一下单返回 验证签名
-		if (SignatureUtil.checkIsSignValidFromWeiXin(unifiedResultXmL)) {
+		if (SignatureUtil.checkIsSignValidFromWeiXin(unifiedResultXmL, null)) {
 			UnifiedOrderResult unifiedOrderResult = XmlUtil.getObjectFromXML(unifiedResultXmL,
 					UnifiedOrderResult.class);
 			if (Objects.equals("SUCCESS", unifiedOrderResult.getReturn_code())

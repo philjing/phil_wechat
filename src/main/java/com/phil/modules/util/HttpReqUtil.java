@@ -7,17 +7,13 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.List;
@@ -74,7 +70,7 @@ public class HttpReqUtil {
 	 *            数据
 	 * @return
 	 */
-	private static String defaultConnection(String method, String path, int timeout, int readTimeout, String data)
+	private static String defaultConnection(String method, String path, int timeout, int readTimeout, String data, String encoding)
 			throws Exception {
 		String result = "";
 		URL url = new URL(path);
@@ -90,7 +86,7 @@ public class HttpReqUtil {
 			}
 			if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
 				InputStream input = conn.getInputStream();
-				result = inputStreamToString(input);
+				result = IOUtil.inputStreamToString(input, encoding);
 				input.close();
 				conn.disconnect();
 			}
@@ -164,7 +160,7 @@ public class HttpReqUtil {
 					}
 					if (charset != null && !"".equals(charset)) {
 						// builder.append(key).append("=").append(URLDecoder.(value,charset));
-						builder.append(key).append("=").append(urlEncode(value, charset));
+						builder.append(key).append("=").append(IOUtil.urlEncode(value, charset));
 					} else {
 						builder.append(key).append("=").append(value);
 					}
@@ -216,11 +212,11 @@ public class HttpReqUtil {
 	 *            输入的数据 允许为空
 	 * @return
 	 */
-	public static String HttpDefaultExecute(String method, String path, Map<String, String> map, String data) {
+	public static String HttpDefaultExecute(String method, String path, Map<String, String> map, String data, String encoding) {
 		String result = "";
 		try {
 			String url = setParmas((TreeMap<String, String>) map, path, "");
-			result = defaultConnection(method, url, DEFAULT_CONNTIME, DEFAULT_READTIME, data);
+			result = defaultConnection(method, url, DEFAULT_CONNTIME, DEFAULT_READTIME, data, encoding);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -240,11 +236,11 @@ public class HttpReqUtil {
 	 *            输入的数据 允许为空
 	 * @return
 	 */
-	public static String HttpsDefaultExecute(String method, String path, Map<String, String> map, String data) {
+	public static String HttpsDefaultExecute(String method, String path, Map<String, String> map, String data, String encoding) {
 		String result = "";
 		try {
 			String url = setParmas((TreeMap<String, String>) map, path, "");
-			result = defaultConnection(method, url, DEFAULT_CONNTIME, DEFAULT_READTIME, data);
+			result = defaultConnection(method, url, DEFAULT_CONNTIME, DEFAULT_READTIME, data, encoding);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -299,7 +295,7 @@ public class HttpReqUtil {
 	 *            contentType请求头信息
 	 * @return Result.type==1 表示文本消息,
 	 */
-	private static WechatResult contentType(String contentType, HttpURLConnection conn, String savePath) {
+	private static WechatResult contentType(String contentType, HttpURLConnection conn, String savePath, String encoding) {
 		WechatResult result = new WechatResult();
 		try {
 			if (conn != null) {
@@ -326,10 +322,10 @@ public class HttpReqUtil {
 				} else if (contentType.equals("audio/mpeg")) { // mp3语言
 					result = inputStreamToMedia(input, savePath, "mp3");
 				} else if (contentType.equals("text/plain")) { // 文本信息
-					String str = inputStreamToString(input);
+					String str = IOUtil.inputStreamToString(input, encoding);
 					result.setObject(str);
 				} else if (contentType.equals("application/json")) { // 返回json格式的数据
-					String str = inputStreamToString(input);
+					String str = IOUtil.inputStreamToString(input, encoding);
 					result.setObject(str);
 				}
 			} else {
@@ -353,7 +349,7 @@ public class HttpReqUtil {
 	 * @return 是否下载成功 Reuslt.success==true 表示下载成功
 	 */
 	public static WechatResult downMeaterMetod(TreeMap<String, String> params, String method, String apiPath,
-			String savePath) {
+			String savePath, String encoding) {
 		WechatResult result = new WechatResult();
 		try {
 			apiPath = setParmas(params, apiPath, "");
@@ -361,7 +357,7 @@ public class HttpReqUtil {
 			HttpURLConnection conn = getConnection(method, url);
 			if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
 				String contentType = conn.getContentType();
-				result = contentType(contentType, conn, savePath);
+				result = contentType(contentType, conn, savePath, encoding);
 			} else {
 				result.setObject(conn.getResponseCode() + "," + conn.getResponseMessage());
 			}
@@ -388,103 +384,25 @@ public class HttpReqUtil {
 	 */
 	private static WechatResult inputStreamToMedia(InputStream inputStream, String savePath, String type) {
 		WechatResult result = new WechatResult();
+		File file = null;
+		file = new File(savePath);
+		String paramPath = file.getParent(); // 路径
+		String fileName = file.getName(); //
+		String newName = fileName.substring(0, fileName.lastIndexOf(".")) + "." + type;// 根据实际返回的文件类型后缀
+		savePath = paramPath + "\\" + newName;
+		if (!file.exists()) {
+			File dirFile = new File(paramPath);
+			dirFile.mkdirs();
+		}
+		file = new File(savePath);
 		try {
-			File file = null;
-			file = new File(savePath);
-			String paramPath = file.getParent(); // 路径
-			String fileName = file.getName(); //
-			String newName = fileName.substring(0, fileName.lastIndexOf(".")) + "." + type;// 根据实际返回的文件类型后缀
-			savePath = paramPath + "\\" + newName;
-			if (!file.exists()) {
-				File dirFile = new File(paramPath);
-				dirFile.mkdirs();
-			}
-			file = new File(savePath);
-			FileOutputStream output = new FileOutputStream(file);
-			int len = 0;
-			byte[] array = new byte[1024];
-			while ((len = inputStream.read(array)) != -1) {
-				output.write(array, 0, len);
-			}
-			output.flush();
-			output.close();
+			IOUtils.copy(inputStream, new FileOutputStream(file));
 			result.setSuccess(true);
 			result.setObject("save success!");
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			// result.setSuccess(false);
-			result.setObject(e.getMessage());
 		} catch (IOException e) {
 			e.printStackTrace();
-			// result.setSuccess(false);
-			result.setObject(e.getMessage());
-			result.setMsg(e.getMessage());
 		}
 		return result;
-	}
-
-	/**
-	 * 编码
-	 * 
-	 * @param source
-	 * @param encode
-	 * @return
-	 */
-	public static String urlEncode(String source, String encode) {
-		String result = source;
-		try {
-			result = URLEncoder.encode(source, encode);
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-		return result;
-	}
-
-	/**
-	 * 将输入流转换字节数组
-	 * 
-	 * @param in
-	 * @return
-	 * @throws IOException
-	 */
-	public static byte[] inputStreamToByteArray(InputStream inputStream) throws IOException {
-		return IOUtils.toByteArray(inputStream);
-	}
-
-	/**
-	 * 将输入流转换为字符串
-	 * 
-	 * @param is
-	 *            待转换为字符串的输入流
-	 * @return 由输入流转换String的字符串
-	 * @throws IOException
-	 */
-	public static String inputStreamToString(InputStream inputStream) throws IOException {
-		return IOUtils.toString(inputStream);
-	}
-
-	/**
-	 * 将字符串转换为输入流
-	 * 
-	 * @param sInputString
-	 *            待转换为输入流的字符串
-	 * @return
-	 * @throws IOException
-	 */
-	public static InputStream toInputStream(String inputStr) throws IOException {
-		// ByteArrayInputStream byteArrayInputStream = null;
-		// if (inputStr != null && !inputStr.trim().equals("")) {
-		// try {
-		// byteArrayInputStream = new
-		// ByteArrayInputStream(sInputString.getBytes(SystemConstant.CHARACTER_ENCODING));
-		// } catch (UnsupportedEncodingException e) {
-		// e.printStackTrace();
-		// }
-		// }
-		if (StringUtils.isEmpty(inputStr)) {
-			return null;
-		}
-		return IOUtils.toInputStream(inputStr, SystemConstant.DEFAULT_CHARACTER_ENCODING); // IOUtils.toInputStream(inputStr);//不写好像是默认UTF-8
 	}
 
 	/**
@@ -510,8 +428,6 @@ public class HttpReqUtil {
 		graphics.drawImage(prevImage, 0, 0, newWidth, newHeight, null);
 		ImageIO.write(image, format, outputStream);
 		outputStream.flush();
-		inputStream.close();
-		outputStream.close();
 		return outputStream;
 	}
 
@@ -554,14 +470,14 @@ public class HttpReqUtil {
 	 * @return
 	 */
 
-	public static UploadMediasResult uploadTempMediaFile(String accessToken, String type, String path) {
+	public static UploadMediasResult uploadTempMediaFile(String accessToken, String type, String path, String encoding) {
 		UploadMediasResult result = null;
 		TreeMap<String, String> params = new TreeMap<>();
 		params.put("access_token", accessToken);
 		params.put("type", type);
 		try {
 			String json = HttpsUploadMediaFile(SystemConstant.POST_METHOD, WechatConfig.UPLOAD_TEMP_MEDIA_TYPE_URL,
-					params, path);
+					params, path, encoding);
 			result = JsonUtil.fromJsonString(json, UploadMediasResult.class);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -579,14 +495,14 @@ public class HttpReqUtil {
 	 *            图片路径
 	 * @return
 	 */
-	public static UploadMediasResult uploadTempMedia(String accessToken, String type, String path) {
+	public static UploadMediasResult uploadTempMedia(String accessToken, String type, String path, String encoding) {
 		UploadMediasResult result = null;
 		TreeMap<String, String> params = new TreeMap<>();
 		params.put("access_token", accessToken);
 		params.put("type", type);
 		try {
 			String json = HttpsUploadMedia(SystemConstant.POST_METHOD, WechatConfig.UPLOAD_TEMP_MEDIA_TYPE_URL, params,
-					path, 0, 0);
+					path, 0, 0, encoding);
 			result = JsonUtil.fromJsonString(json, UploadMediasResult.class);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -602,14 +518,14 @@ public class HttpReqUtil {
 	 *            媒体文件类型，分别有图片（image）、语音（voice）、视频（video）和缩略图（thumb）
 	 * @return
 	 */
-	public static UploadMediasResult uploadForeverMediaFile(String accessToken, String type, String path) {
+	public static UploadMediasResult uploadForeverMediaFile(String accessToken, String type, String path, String encoding) {
 		UploadMediasResult result = null;
 		TreeMap<String, String> params = new TreeMap<>();
 		params.put("access_token", accessToken);
 		params.put("type", type);
 		try {
 			String json = HttpsUploadMediaFile(SystemConstant.POST_METHOD, WechatConfig.UPLOAD_FOREVER_MEDIA_TYPE_URL,
-					params, path);
+					params, path, encoding);
 			result = JsonUtil.fromJsonString(json, UploadMediasResult.class);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -625,14 +541,14 @@ public class HttpReqUtil {
 	 *            媒体文件类型，分别有图片（image）、语音（voice）、视频（video）和缩略图（thumb）
 	 * @return
 	 */
-	public static UploadMediasResult uploadForeverMedia(String accessToken, String type, String path) {
+	public static UploadMediasResult uploadForeverMedia(String accessToken, String type, String path, String encoding) {
 		UploadMediasResult result = null;
 		TreeMap<String, String> params = new TreeMap<>();
 		params.put("access_token", accessToken);
 		params.put("type", type);
 		try {
 			String json = HttpsUploadMedia(SystemConstant.POST_METHOD, WechatConfig.UPLOAD_FOREVER_MEDIA_TYPE_URL, params,
-					path, 0, 0);
+					path, 0, 0, encoding);
 			result = JsonUtil.fromJsonString(json, UploadMediasResult.class);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -646,14 +562,14 @@ public class HttpReqUtil {
 	 * @param accessToken
 	 * @return
 	 */
-	public static String uploadForeverMediaFile(String accessToken, String title, String introduction, String path) {
+	public static String uploadForeverMediaFile(String accessToken, String title, String introduction, String path, String encoding) {
 		TreeMap<String, String> params = new TreeMap<>();
 		params.put("access_token", accessToken);
 		params.put("type", "video");
 		String mediaId = null;
 		try {
 			String json = HttpsUploadVideoMediaFile(SystemConstant.POST_METHOD,
-					WechatConfig.UPLOAD_FOREVER_MEDIA_TYPE_URL, params, path, title, introduction);
+					WechatConfig.UPLOAD_FOREVER_MEDIA_TYPE_URL, params, path, title, introduction, encoding);
 			mediaId = JsonUtil.fromJsonString(json, "media_id");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -667,14 +583,14 @@ public class HttpReqUtil {
 	 * @param accessToken
 	 * @return
 	 */
-	public static String uploadForeverMedia(String accessToken, String title, String introduction, String path) {
+	public static String uploadForeverMedia(String accessToken, String title, String introduction, String path, String encoding) {
 		TreeMap<String, String> params = new TreeMap<>();
 		params.put("access_token", accessToken);
 		params.put("type", "video");
 		String mediaId = null;
 		try {
 			String json = HttpsUploadVideoMedia(SystemConstant.POST_METHOD, WechatConfig.UPLOAD_FOREVER_MEDIA_TYPE_URL,
-					params, path, title, introduction, 0, 0);
+					params, path, title, introduction, 0, 0, encoding);
 			mediaId = JsonUtil.fromJsonString(json, "media_id");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -691,7 +607,7 @@ public class HttpReqUtil {
 	 *            图文消息对象
 	 * @return
 	 */
-	public static UploadMediasResult uploadNewsMedia(String accessToken, List<UploadNewsMedia> entity) {
+	public static UploadMediasResult uploadNewsMedia(String accessToken, List<UploadNewsMedia> entity, String encoding) {
 		UploadMediasResult result = null;
 		TreeMap<String, String> params = new TreeMap<>();
 		params.put("access_token", accessToken);
@@ -700,7 +616,7 @@ public class HttpReqUtil {
 		dataParams.put("articles", entity);
 		String data = JsonUtil.toJsonString(dataParams);
 		String json = HttpReqUtil.HttpsDefaultExecute(SystemConstant.POST_METHOD,
-				WechatConfig.UPLOAD_FOREVER_NEWS_MEDIA_URL, params, data);
+				WechatConfig.UPLOAD_FOREVER_NEWS_MEDIA_URL, params, data, encoding);
 		result = JsonUtil.fromJsonString(json, UploadMediasResult.class);
 		return result;
 	}
@@ -712,13 +628,13 @@ public class HttpReqUtil {
 	 * @param path
 	 * @return
 	 */
-	public static String uploadImgMediaFile(String accessToken, String path) {
+	public static String uploadImgMediaFile(String accessToken, String path, String encoding) {
 		TreeMap<String, String> params = new TreeMap<>();
 		params.put("access_token", accessToken);
 		String url = null;
 		try {
 			String json = HttpsUploadMediaFile(SystemConstant.POST_METHOD, WechatConfig.UPLOAD_IMG_MEDIA_URL, params,
-					path);
+					path, encoding);
 			url = JsonUtil.fromJsonString(json, "url");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -733,13 +649,13 @@ public class HttpReqUtil {
 	 * @param path
 	 * @return
 	 */
-	public static String uploadImgMedia(String accessToken, String path) {
+	public static String uploadImgMedia(String accessToken, String path, String encoding) {
 		TreeMap<String, String> params = new TreeMap<String, String>();
 		params.put("access_token", accessToken);
 		String url = null;
 		try {
 			String json = HttpsUploadMedia(SystemConstant.POST_METHOD, WechatConfig.UPLOAD_IMG_MEDIA_URL, params, path, 0,
-					0);
+					0, encoding);
 			url = JsonUtil.fromJsonString(json, "url");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -754,14 +670,14 @@ public class HttpReqUtil {
 	 * @param uploadVideo
 	 * @return
 	 */
-	public static UploadMediasResult uploadMediaVideo(String accessToken, MpVideoMedia mpVideoMedia) {
+	public static UploadMediasResult uploadMediaVideo(String accessToken, MpVideoMedia mpVideoMedia, String encoding) {
 		UploadMediasResult result = null;
 		TreeMap<String, String> params = new TreeMap<String, String>();
 		params.put("access_token", accessToken);
 		// post 提交的参数
 		String data = JsonUtil.toJsonString(mpVideoMedia);
 		String json = HttpReqUtil.HttpsDefaultExecute(SystemConstant.POST_METHOD, WechatConfig.UPLOAD_VIDEO_MEDIA_URL,
-				params, data);
+				params, data, encoding);
 		result = JsonUtil.fromJsonString(json, UploadMediasResult.class);
 		return result;
 	}
@@ -780,7 +696,7 @@ public class HttpReqUtil {
 	 * @return
 	 * @throws Exception
 	 */
-	public static String HttpsUploadMediaFile(String method, String path, Map<String, String> param, String mediaPath)
+	public static String HttpsUploadMediaFile(String method, String path, Map<String, String> param, String mediaPath, String encoding)
 			throws Exception {
 		String result = null;
 		URL url = new URL(setParmas(param, path, ""));
@@ -819,17 +735,10 @@ public class HttpReqUtil {
 			// 结尾部分
 			IOUtils.write(("\r\n--" + boundary + "--\r\n").getBytes(SystemConstant.DEFAULT_CHARACTER_ENCODING), output);
 			output.flush();
-			result = inputStreamToString(con.getInputStream());
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		} catch (ProtocolException e) {
-			e.printStackTrace();
+			result = IOUtil.inputStreamToString(con.getInputStream(), encoding);
 		} catch (IOException e) {
 			throw new IOException("read data error");
-		} finally {
-			IOUtils.closeQuietly(output);
-			IOUtils.closeQuietly(inputStream);
-		}
+		} 
 		return result;
 	}
 
@@ -852,7 +761,7 @@ public class HttpReqUtil {
 	 * @throws Exception
 	 */
 	public static String HttpsUploadMedia(String method, String path, Map<String, String> param, String mediaPath,
-			int connTime, int readTime) throws Exception {
+			int connTime, int readTime, String encoding) throws Exception {
 		String result = "";
 		URL url = new URL(setParmas(param, path, ""));
 		OutputStream output = null;
@@ -884,18 +793,11 @@ public class HttpReqUtil {
 				IOUtils.write(("\r\n----" + boundary + "--\r\n").getBytes(), output);
 				mediaConn.disconnect();
 				// 获取输入流
-				result = inputStreamToString(conn.getInputStream());
+				result = IOUtil.inputStreamToString(conn.getInputStream(), encoding);
 			}
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		} catch (ProtocolException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-		} finally {
-			IOUtils.closeQuietly(output);
-			IOUtils.closeQuietly(inputStream);
-		}
+		} 
 		return result;
 	}
 
@@ -918,7 +820,7 @@ public class HttpReqUtil {
 	 * @throws Exception
 	 */
 	public static String HttpsUploadVideoMediaFile(String method, String path, Map<String, String> param,
-			String mediaPath, String title, String introduction) throws Exception {
+			String mediaPath, String title, String introduction, String encoding) throws Exception {
 		String result = null;
 		URL url = new URL(setParmas(param, path, ""));
 		OutputStream output = null;
@@ -959,17 +861,10 @@ public class HttpReqUtil {
 			IOUtils.write(("\r\n--" + boundary + "--\r\n\r\n").getBytes(SystemConstant.DEFAULT_CHARACTER_ENCODING),
 					output);
 			output.flush();
-			result = inputStreamToString(con.getInputStream());
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		} catch (ProtocolException e) {
-			e.printStackTrace();
+			result = IOUtil.inputStreamToString(con.getInputStream(), encoding);
 		} catch (IOException e) {
 			throw new IOException("read data error");
-		} finally {
-			IOUtils.closeQuietly(output);
-			IOUtils.closeQuietly(inputStream);
-		}
+		} 
 		return result;
 	}
 
@@ -996,7 +891,7 @@ public class HttpReqUtil {
 	 * @throws Exception
 	 */
 	public static String HttpsUploadVideoMedia(String method, String path, Map<String, String> param, String mediaPath,
-			String title, String introduction, int connTime, int readTime) throws Exception {
+			String title, String introduction, int connTime, int readTime, String encoding) throws Exception {
 		String result = null;
 		URL url = new URL(setParmas(param, path, ""));
 		OutputStream output = null;
@@ -1032,17 +927,10 @@ public class HttpReqUtil {
 						output);
 				mediaConn.disconnect();
 				// 获取输入流
-				result = inputStreamToString(conn.getInputStream());
+				result = IOUtil.inputStreamToString(conn.getInputStream(), encoding);
 			}
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		} catch (ProtocolException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
 			throw new IOException("read data error");
-		} finally {
-			IOUtils.closeQuietly(output);
-			IOUtils.closeQuietly(inputStream);
 		}
 		return result;
 	}

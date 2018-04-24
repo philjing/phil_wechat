@@ -4,6 +4,8 @@ import java.security.MessageDigest;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.phil.modules.constant.SystemConstant;
+
 /**
  * MD5加密工具类
  * 
@@ -38,7 +40,7 @@ public class MD5Util {
 			resultString = new String(origin);
 			MessageDigest md = MessageDigest.getInstance("MD5");
 			if(StringUtils.isEmpty(charsetname)) {
-				resultString = byteArrayToHexString(md.digest(resultString.getBytes()));
+				resultString = byteArrayToHexString(md.digest(resultString.getBytes(SystemConstant.DEFAULT_CHARACTER_ENCODING)));
 			} else {
 				resultString = byteArrayToHexString(md.digest(resultString.getBytes(charsetname)));
 			}

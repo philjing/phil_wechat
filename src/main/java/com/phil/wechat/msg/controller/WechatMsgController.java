@@ -241,7 +241,7 @@ public class WechatMsgController extends BaseController {
 		String mediaPath = "C:/Users/phil/Pictures/image/8538572f61d7a94cf0b9fe0f290cdb28.jpg";
 		// UploadMediasResult umr = HttpReqUtil.uploadTempMedia("phil_token", "image",
 		// mediaPath);
-		UploadMediasResult umr = HttpReqUtil.uploadTempMediaFile("phil_token", "image", mediaPath);
+		UploadMediasResult umr = HttpReqUtil.uploadTempMediaFile("phil_token", "image", mediaPath, null);
 		logger.debug(" mediaUploadimg media_id result {} ", umr.getMedia_id());
 		return null;
 	}
@@ -250,9 +250,9 @@ public class WechatMsgController extends BaseController {
 	public MassMsgResult sendByOpenid() throws Exception {
 		// 根据OpenID列表群发图文消息
 		String mediaPath1 = "C:/Users/phil/Pictures/image/8538572f61d7a94cf0b9fe0f290cdb28.jpg";
-		UploadMediasResult result1 = HttpReqUtil.uploadTempMedia("phil_token", "image", mediaPath1);
+		UploadMediasResult result1 = HttpReqUtil.uploadTempMedia("phil_token", "image", mediaPath1, null);
 		String mediaPath2 = "C:/Users/phil/Pictures/image/685977abgw1f8xqp46dgyj20qo0zktfi.jpg";
-		UploadMediasResult result2 = HttpReqUtil.uploadTempMedia("phil_token", "image", mediaPath2);
+		UploadMediasResult result2 = HttpReqUtil.uploadTempMedia("phil_token", "image", mediaPath2, null);
 		List<UploadNewsMedia> array = new ArrayList<>();
 		UploadNewsMedia entity1 = new UploadNewsMedia();
 		entity1.setAuthor("phil");
@@ -273,7 +273,7 @@ public class WechatMsgController extends BaseController {
 		entity2.setTitle(" 经典语录");
 		array.add(entity2);
 		// 获取图文消息结果
-		UploadMediasResult ur = HttpReqUtil.uploadNewsMedia("phil_token", array);
+		UploadMediasResult ur = HttpReqUtil.uploadNewsMedia("phil_token", array, null);
 		List<String> openids = new ArrayList<>();
 		openids.add("ovHQ5v9-ZsHUcax_nTCQwiP-sBcg");
 		openids.add("ovHQ5v6CW3INkWUsCl3olODif0cc");

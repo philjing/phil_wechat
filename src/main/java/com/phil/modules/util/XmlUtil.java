@@ -13,7 +13,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.commons.io.IOUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -66,12 +65,8 @@ public class XmlUtil {
 			for (Element e : elementList) {
 				map.put(e.getName(), e.getText());
 			}
-		} catch (IOException e) {
+		} catch (IOException | DocumentException e) {
 			e.printStackTrace();
-		} catch (DocumentException e) {
-			e.printStackTrace();
-		} finally {
-			IOUtils.closeQuietly(inputStream);
 		}
 		return map;
 	}
@@ -104,8 +99,6 @@ public class XmlUtil {
 			}
 		} catch (DocumentException e) {
 			e.printStackTrace();
-		} finally {
-			IOUtils.closeQuietly(inputStream);
 		}
 		return map;
 	}
@@ -119,12 +112,12 @@ public class XmlUtil {
 	 * @throws IOException
 	 * @throws SAXException
 	 */
-	public static TreeMap<String, Object> parseXmlToTreeMap(String xml)
+	public static TreeMap<String, Object> parseXmlToTreeMap(String xml, String encoding)
 			throws ParserConfigurationException, IOException, SAXException {
 		// 这里用Dom的方式解析回包的最主要目的是防止API新增回包字段
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder = factory.newDocumentBuilder();
-		InputStream is = IOUtils.toInputStream(xml);
+		InputStream is = IOUtil.toInputStream(xml, encoding);
 		org.w3c.dom.Document document = builder.parse(is);
 		// 获取到document里面的全部结点
 		org.w3c.dom.NodeList allNodes = document.getFirstChild().getChildNodes();
@@ -149,12 +142,12 @@ public class XmlUtil {
 	 * @throws IOException
 	 * @throws SAXException
 	 */
-	public static Map<String, Object> parseXmlToMap(String xml)
+	public static Map<String, Object> parseXmlToMap(String xml, String encoding)
 			throws ParserConfigurationException, IOException, SAXException {
 		// 这里用Dom的方式解析回包的最主要目的是防止API新增回包字段
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder = factory.newDocumentBuilder();
-		InputStream is = IOUtils.toInputStream(xml);
+		InputStream is = IOUtil.toInputStream(xml, encoding);
 		org.w3c.dom.Document document = builder.parse(is);
 		// 获取到document里面的全部结点
 		org.w3c.dom.NodeList allNodes = document.getFirstChild().getChildNodes();

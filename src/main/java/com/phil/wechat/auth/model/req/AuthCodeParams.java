@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.phil.modules.constant.SystemConstant;
-import com.phil.modules.util.HttpReqUtil;
+import com.phil.modules.util.IOUtil;
 import com.phil.wechat.base.param.AbstractParams;
 
 /**
@@ -47,7 +47,7 @@ public class AuthCodeParams extends AbstractParams {
 	public Map<String, String> getParams() throws UnsupportedEncodingException {
 		Map<String, String> params = new TreeMap<String, String>();
 		params.put("appid", this.appid);
-		params.put("redirect_uri", HttpReqUtil.urlEncode(this.redirect_uri, SystemConstant.DEFAULT_CHARACTER_ENCODING));
+		params.put("redirect_uri", IOUtil.urlEncode(this.redirect_uri, SystemConstant.DEFAULT_CHARACTER_ENCODING));
 		params.put("response_type", this.response_type);
 		params.put("scope", this.scope);
 		params.put("state", this.state);

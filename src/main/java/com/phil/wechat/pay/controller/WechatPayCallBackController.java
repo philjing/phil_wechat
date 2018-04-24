@@ -3,7 +3,6 @@ package com.phil.wechat.pay.controller;
 import java.io.BufferedOutputStream;
 import java.util.Objects;
 
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -12,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.phil.modules.config.WechatConfig;
 import com.phil.modules.constant.SystemConstant;
 import com.phil.modules.util.HttpReqUtil;
+import com.phil.modules.util.IOUtil;
 import com.phil.modules.util.PayUtil;
 import com.phil.modules.util.SignatureUtil;
 import com.phil.modules.util.XmlUtil;
@@ -38,7 +38,7 @@ public class WechatPayCallBackController extends BaseController {
 	public void callBack() throws Exception {
 		String resXml = "";// 反馈给微信服务器
 		// 微信支付系统发送的数据（<![CDATA[product_001]]>格式）
-		String xml = HttpReqUtil.inputStreamToString(this.getRequest().getInputStream());
+		String xml = IOUtil.inputStreamToString(this.getRequest().getInputStream(), null);
 		// logger.info("微信支付系统发送的数据"+xml);
 		/**** 微信支付系统发送的数据其实就是回调地址输入的参数Xml ****/
 		// 验证签名
@@ -78,7 +78,7 @@ public class WechatPayCallBackController extends BaseController {
 			String unifiedXmL = XmlUtil.toSplitXml(unifiedOrderParams);
 			// 统一下单 返回的xml
 			String unifiedOrderResultXmL = HttpReqUtil.HttpsDefaultExecute(SystemConstant.POST_METHOD,
-					WechatConfig.UNIFIED_ORDER_URL, null, unifiedXmL);
+					WechatConfig.UNIFIED_ORDER_URL, null, unifiedXmL, null);
 			// 统一下单返回 验证签名
 			if (SignatureUtil.checkIsSignValidFromWeiXin(unifiedOrderResultXmL, PayConstant.API_KEY,
 					SystemConstant.DEFAULT_CHARACTER_ENCODING)) {
@@ -117,8 +117,6 @@ public class WechatPayCallBackController extends BaseController {
 			out.flush();
 		} catch (Exception e) {
 			e.printStackTrace();
-		} finally {
-			IOUtils.closeQuietly(out);
-		}
+		} 
 	}
 }
