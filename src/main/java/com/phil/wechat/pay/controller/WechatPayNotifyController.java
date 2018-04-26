@@ -36,7 +36,7 @@ public class WechatPayNotifyController extends BaseController {
 		String notifyXml = IOUtil.inputStreamToString(this.getRequest().getInputStream(), null);// 微信支付系统发送的数据（<![CDATA[product_001]]>格式）
 		logger.debug("微信支付系统发送的数据" + notifyXml);
 		// 验证签名
-		if (SignatureUtil.checkIsSignValidFromWeiXin(notifyXml, null)) {
+		if (SignatureUtil.checkIsSignValidFromWeiXin(notifyXml, null, null)) {
 			PayNotifyResult notify = XmlUtil.getObjectFromXML(notifyXml, PayNotifyResult.class);
 			logger.debug("支付结果 {}", notify.toString());
 			if (Objects.equals("SUCCESS", notify.getResult_code())) {

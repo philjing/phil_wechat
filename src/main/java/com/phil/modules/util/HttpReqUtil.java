@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -32,6 +31,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -82,12 +82,10 @@ public class HttpReqUtil {
 				OutputStream output = conn.getOutputStream();
 				output.write(data.getBytes(SystemConstant.DEFAULT_CHARACTER_ENCODING));
 				output.flush();
-				output.close();
 			}
 			if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
 				InputStream input = conn.getInputStream();
 				result = IOUtil.inputStreamToString(input, encoding);
-				input.close();
 				conn.disconnect();
 			}
 		}
@@ -147,7 +145,7 @@ public class HttpReqUtil {
 		String result = "";
 		boolean hasParams = false;
 		if (path != null && !"".equals(path)) {
-			if (map != null && map.size() > 0) {
+			if (MapUtils.isNotEmpty(map)) {
 				StringBuilder builder = new StringBuilder();
 				Set<Entry<String, String>> params = map.entrySet();
 				for (Entry<String, String> entry : params) {
@@ -202,14 +200,10 @@ public class HttpReqUtil {
 	/**
 	 * 默认的http请求执行方法,返回
 	 * 
-	 * @param method
-	 *            请求的方法 POST/GET
-	 * @param path
-	 *            请求path 路径
-	 * @param map
-	 *            请求参数集合
-	 * @param data
-	 *            输入的数据 允许为空
+	 * @param method 请求的方法 POST/GET
+	 * @param path 请求path 路径
+	 * @param map 请求参数集合
+	 * @param data 输入的数据 允许为空
 	 * @return
 	 */
 	public static String HttpDefaultExecute(String method, String path, Map<String, String> map, String data, String encoding) {
@@ -250,9 +244,7 @@ public class HttpReqUtil {
 	/**
 	 * 文件路径
 	 * 
-	 * @param mediaUrl
-	 *            url 例如
-	 *            http://su.bdimg.com/static/superplus/img/logo_white_ee663702.png
+	 * @param mediaUrl url 例如 http://su.bdimg.com/static/superplus/img/logo_white_ee663702.png
 	 * @return logo_white_ee663702.png
 	 */
 	private static String getFileName(String mediaUrl) {
@@ -361,10 +353,6 @@ public class HttpReqUtil {
 			} else {
 				result.setObject(conn.getResponseCode() + "," + conn.getResponseMessage());
 			}
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -463,10 +451,8 @@ public class HttpReqUtil {
 	 * 上传临时素材(本地)
 	 * 
 	 * @param accessToken
-	 * @param type
-	 *            媒体文件类型，分别有图片（image）、语音（voice）、视频（video）和缩略图（thumb）
-	 * @param path
-	 *            图片路径
+	 * @param type  媒体文件类型，分别有图片（image）、语音（voice）、视频（video）和缩略图（thumb）
+	 * @param path  图片路径
 	 * @return
 	 */
 

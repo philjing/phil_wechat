@@ -1,7 +1,6 @@
 package com.phil.wechat.auth.controller;
 
 import java.util.Map;
-import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.commons.lang3.StringUtils;
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.phil.modules.config.WechatConfig;
-import com.phil.modules.constant.SystemConstant;
 import com.phil.modules.util.DateTimeUtil;
 import com.phil.modules.util.MD5Util;
 import com.phil.modules.util.PayUtil;
@@ -53,13 +51,12 @@ public class WechatAuthController extends BaseController {
 		jssdkconfig.setAppId(WechatConfig.APP_ID);
 		jssdkconfig.setTimestamp(DateTimeUtil.currentTime());
 		jssdkconfig.setNoncestr(PayUtil.createNonceStr());
-		SortedMap<Object, Object> params = new TreeMap<Object, Object>();
-//		params.put("jsapi_ticket", wechatAuthService
-//				.getTicket(ObjectUtil.toString(redisTemplate.opsForValue().get(WechatConfig.APP_ID), false)));
+		TreeMap<Object, Object> params = new TreeMap<>();
+//		params.put("jsapi_ticket", wechatAuthService.getTicket(ObjectUtil.toString(redisTemplate.opsForValue().get(WechatConfig.APP_ID), false)));
 		params.put("noncestr", jssdkconfig.getNoncestr());
 		params.put("timestamp", jssdkconfig.getTimestamp());
 		params.put("url", this.getRequest().getRequestURL().toString());
-		String signature = SignatureUtil.createSha1Sign(params, null, SystemConstant.DEFAULT_CHARACTER_ENCODING);
+		String signature = SignatureUtil.createSha1Sign(params, null, null);
 		jssdkconfig.setSignature(signature);
 		logger.debug("JsSDKConfig {}", jssdkconfig);
 		data.put("data", jssdkconfig);

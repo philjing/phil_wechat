@@ -98,7 +98,7 @@ public class WechatPayController extends BaseController {
 				WechatConfig.UNIFIED_ORDER_URL, null, unifiedXmL, null);
 		// 进行签名校验
 		try {
-			if (SignatureUtil.checkIsSignValidFromWeiXin(unifiedOrderResultXmL, null)) {
+			if (SignatureUtil.checkIsSignValidFromWeiXin(unifiedOrderResultXmL, null, null)) {
 				String timeStamp = PayUtil.createTimeStamp();
 				// 统一下单响应
 				UnifiedOrderResult unifiedOrderResult = XmlUtil.getObjectFromXML(unifiedOrderResultXmL,
@@ -213,7 +213,7 @@ public class WechatPayController extends BaseController {
 				WechatConfig.UNIFIED_ORDER_URL, null, unifiedXmL, null);
 		// logger.debug("统一下单 返回的xml("+unifiedResultXmL);
 		// 统一下单返回 验证签名
-		if (SignatureUtil.checkIsSignValidFromWeiXin(unifiedResultXmL, null)) {
+		if (SignatureUtil.checkIsSignValidFromWeiXin(unifiedResultXmL, null, null)) {
 			UnifiedOrderResult unifiedOrderResult = XmlUtil.getObjectFromXML(unifiedResultXmL,
 					UnifiedOrderResult.class);
 			if (Objects.equals("SUCCESS", unifiedOrderResult.getReturn_code())
