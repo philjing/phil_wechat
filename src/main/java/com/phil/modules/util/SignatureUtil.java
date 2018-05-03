@@ -8,6 +8,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeMap;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -20,7 +21,6 @@ import org.xml.sax.SAXException;
 
 import com.phil.modules.config.WechatConfig;
 import com.phil.modules.constant.SystemConstant;
-import com.phil.wechat.pay.constant.PayConstant;
 
 /**
  * 签名工具类
@@ -44,13 +44,12 @@ public class SignatureUtil {
 		String[] arr = new String[] { WechatConfig.WECHAT_TOKEN, timestamp, nonce };
 		// 将token、timestamp、nonce三个参数进行字典序排序
 		Arrays.sort(arr);
-		StringBuilder content = new StringBuilder();
+		StringBuffer content = new StringBuffer();
 		for (int i = 0; i < arr.length; i++) {
 			content.append(arr[i]);
 		}
 		MessageDigest md = null;
 		String tmpStr = null;
-
 		try {
 			md = MessageDigest.getInstance("SHA-1");
 			// 将三个参数字符串拼接成一个字符串进行sha1加密
@@ -94,7 +93,6 @@ public class SignatureUtil {
 
 	/**
 	 * 通过Class获取签名
-	 * 
 	 * @param o 待加密的对象 该处仅限于Class
 	 * @param apiKey  公众号key
 	 * @param encoding 编码
@@ -107,42 +105,27 @@ public class SignatureUtil {
 	}
 
 	/**
-	 * 通过Map<Object,Object>中的所有元素参与签名
-	 * 
-	 * @param map
-	 *            待参与签名的map集合
-	 * @params apikey apikey中 如果为空则不参与签名，如果不为空则参与签名
-	 * @return
-	 */
-	public static String createSign(Map<Object, Object> map, String apiKey, String encoding) {
-		String result = notSignParams(map, apiKey);
-		result = MD5Util.MD5Encode(result, encoding).toUpperCase();
-		logger.debug("sign result {}", result);
-		return result;
-	}
-
-	/**
-	 * 通过TreeMap<Object,Object>中的所有元素参与签名
-	 * 
-	 * @param map  待参与签名的map集合
-	 * @params apikey apikey中 如果为空则不参与签名，如果不为空则参与签名
-	 * @return
-	 */
-	public static String createSign(TreeMap<Object, Object> map, String apiKey, String encoding) {
-		String result = notSignParams(map, apiKey);
-		result = MD5Util.MD5Encode(result, encoding).toUpperCase();
-		logger.debug("sign result {}", result);
-		return result;
-	}
-
-	/**
-	 * 通过TreeMap<Object,Object>中的所有元素参与签名
+	 * 通过Map<String, Object>中的所有元素参与签名
 	 * 
 	 * @param map 待参与签名的map集合
 	 * @params apikey apikey中 如果为空则不参与签名，如果不为空则参与签名
 	 * @return
 	 */
-	public static String createSha1Sign(TreeMap<Object, Object> map, String apiKey, String encoding) {
+	public static String createSign(Map<String, Object> map, String apiKey, String encoding) {
+		String result = notSignParams(map, apiKey);
+		result = MD5Util.MD5Encode(result, encoding).toUpperCase();
+		logger.debug("sign result {}", result);
+		return result;
+	}
+
+	/**
+	 * 通过Map<String, Object>中的所有元素参与签名
+	 * 
+	 * @param map 待参与签名的map集合
+	 * @params apikey apikey中 如果为空则不参与签名，如果不为空则参与签名
+	 * @return
+	 */
+	public static String createSha1Sign(Map<String, Object> map, String apiKey, String encoding) {
 		String result = notSignParams(map, apiKey);
 		MessageDigest md = null;
 		try {
@@ -162,7 +145,7 @@ public class SignatureUtil {
 	
 	/**
 	 * 将字段集合方法转换
-	 * 
+	 * (考虑加入annotation签名注解扫描)
 	 * @param array
 	 * @param object
 	 * @return
@@ -188,25 +171,6 @@ public class SignatureUtil {
 
 	/**
 	 * 返回未加密的字符串
-	 * 
-	 * @param params
-	 * @param apiKey
-	 * @return 待加密的字符串
-	 */
-	private static String notSignParams(TreeMap<Object, Object> params, String apiKey) {
-		StringBuffer buffer = new StringBuffer();
-		for (Map.Entry<Object, Object> entry : params.entrySet()) {
-			if (!org.springframework.util.StringUtils.isEmpty(entry.getValue())) {
-				buffer.append(entry.getKey() + "=" + entry.getValue() + "&");
-			}
-		}
-		buffer.append("key=" + apiKey);
-		return buffer.toString();
-	}
-
-	/**
-	 * 签名算法
-	 * 
 	 * @param o 要参与签名的数据对象
 	 * @param apiKey  API密匙
 	 * @return 签名
@@ -224,12 +188,12 @@ public class SignatureUtil {
 			int size = list.size();
 			String[] arrayToSort = list.toArray(new String[size]);
 			Arrays.sort(arrayToSort, String.CASE_INSENSITIVE_ORDER); // 严格按字母表顺序排序
-			StringBuilder sb = new StringBuilder();
+			StringBuffer sb = new StringBuffer();
 			for (int i = 0; i < size; i++) {
 				sb.append(arrayToSort[i]);
 			}
 			result = sb.toString();
-			if (StringUtils.isEmpty(apiKey)) {
+			if (StringUtils.isNotEmpty(apiKey)) {
 				result += "key=" + apiKey;
 			} else {
 				result = result.substring(0, result.lastIndexOf("&"));
@@ -242,14 +206,13 @@ public class SignatureUtil {
 	
 	/**
 	 * 返回未加密的字符串
-	 * 
 	 * @param params
 	 * @param apiKey
 	 * @return 待加密的字符串
 	 */
-	private static String notSignParams(Map<Object, Object> params, String apiKey) {
+	private static String notSignParams(Map<String, Object> params, String apiKey) {
 		ArrayList<String> list = new ArrayList<>();
-		for (Map.Entry<Object, Object> entry : params.entrySet()) {
+		for (Map.Entry<String, Object> entry : params.entrySet()) {
 			if (entry.getValue() != "" && entry.getValue() != null) {
 				list.add(entry.getKey() + "=" + entry.getValue() + "&");
 			}
@@ -257,32 +220,27 @@ public class SignatureUtil {
 		int size = list.size();
 		String[] arrayToSort = list.toArray(new String[size]);
 		Arrays.sort(arrayToSort, String.CASE_INSENSITIVE_ORDER);
-		StringBuilder sb = new StringBuilder();
+		StringBuffer sb = new StringBuffer();
 		for (int i = 0; i < size; i++) {
 			sb.append(arrayToSort[i]);
 		}
 		String result = sb.toString();
-		if (StringUtils.isEmpty(apiKey)) {
+		if (StringUtils.isNotEmpty(apiKey)) {
 			result += "key=" + apiKey;
 		} else {
 			result = result.substring(0, result.lastIndexOf("&"));
 		}
 		return result;
 	}
-
+	
 	/**
 	 * 从API返回的XML数据里面重新计算一次签名
 	 * 
 	 * @param responseStrin API返回的XML数据
 	 * @param apiKey Key
 	 * @return 新的签名
-	 * @throws ParserConfigurationException
-	 * @throws IOException
-	 * @throws SAXException
 	 */
-	public static String reCreateSign(String responseString, String apiKey, String encoding)
-			throws IOException, SAXException, ParserConfigurationException {
-		Map<Object, Object> map = XmlUtil.parseXmlToMap(responseString, encoding);
+	private static String reCreateSign(Map<String, Object> map, String apiKey, String encoding) {
 		// 清掉返回数据对象里面的Sign数据（不能把这个数据也加进去进行签名），然后用签名算法进行签名
 		map.put("sign", "");
 		// 将API返回的数据根据用签名算法进行计算新的签名，用来跟API返回的签名进行比较
@@ -291,7 +249,6 @@ public class SignatureUtil {
 
 	/**
 	 * 检验API返回的数据里面的签名是否合法,规则是:按参数名称a-z排序,遇到空值的参数不参加签名
-	 * 
 	 * @param resultXml  API返回的XML数据字符串
 	 * @param apiKey  Key
 	 * @return API签名是否合法
@@ -300,23 +257,16 @@ public class SignatureUtil {
 	 * @throws SAXException
 	 * @throws DocumentException
 	 */
-	public static boolean checkIsSignValidFromWeiXin(String checktXml, String apiKey, String encoding)
-			throws ParserConfigurationException, IOException, SAXException, DocumentException {
-		TreeMap<Object, Object> map = XmlUtil.parseXmlToTreeMap(checktXml,encoding);
-		String signFromresultXml = (String) map.get("sign");
-		if (StringUtils.isEmpty(signFromresultXml)) {
+	public static boolean checkIsSignValidFromWeiXin(String checktXml, String apiKey, String encoding) throws ParserConfigurationException, IOException, SAXException {
+		TreeMap<String, Object> map = XmlUtil.parseXmlToTreeMap(checktXml,encoding);
+		String signFromResultXml = (String) map.get("sign");
+		if (StringUtils.isEmpty(signFromResultXml)) {
 			logger.error("API返回的数据签名数据不存在");
 			return false;
 		}
-//		logger.debug("服务器回包里面的签名{}", signFromresultXml);
-		// 清掉返回数据对象里面的Sign数据（不能把这个数据也加进去进行签名），然后用签名算法进行签名
-		map.put("sign", "");
 		// 将API返回的数据根据用签名算法进行计算新的签名，用来跟API返回的签名进行比较
-		if(StringUtils.isEmpty(apiKey)) {
-			apiKey = PayConstant.API_KEY;
-		}
-		String signForAPIResponse = createSign(map, apiKey, encoding);
-		if (!signForAPIResponse.equals(signFromresultXml)) {
+		String signForAPIResponse = reCreateSign(map, apiKey, encoding);
+		if(!Objects.equals(signFromResultXml, signForAPIResponse)) {
 			// 签名验不过，表示这个API返回的数据有可能已经被篡改了
 			logger.error("API返回的数据签名验证不通过");
 			return false;
@@ -324,4 +274,5 @@ public class SignatureUtil {
 		logger.debug("API返回的数据签名验证通过");
 		return true;
 	}
+	
 }

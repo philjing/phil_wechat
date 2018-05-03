@@ -51,7 +51,7 @@ public class WechatAuthController extends BaseController {
 		jssdkconfig.setAppId(WechatConfig.APP_ID);
 		jssdkconfig.setTimestamp(DateTimeUtil.currentTime());
 		jssdkconfig.setNoncestr(PayUtil.createNonceStr());
-		TreeMap<Object, Object> params = new TreeMap<>();
+		TreeMap<String, Object> params = new TreeMap<>();
 //		params.put("jsapi_ticket", wechatAuthService.getTicket(ObjectUtil.toString(redisTemplate.opsForValue().get(WechatConfig.APP_ID), false)));
 		params.put("noncestr", jssdkconfig.getNoncestr());
 		params.put("timestamp", jssdkconfig.getTimestamp());
@@ -84,7 +84,7 @@ public class WechatAuthController extends BaseController {
 	        authTokenParams.setSecret(WechatConfig.APP_SECRET);  
 	        authTokenParams.setCode(code);
 	        authAccessToken = wechatAuthService.getAuthAccessToken(authTokenParams, null);
-	        logger.debug("正在支付的openid {} "	,authAccessToken.getOpenid());  
+	        logger.debug("正在支付的openid {} ", authAccessToken.getOpenid());  
 	        return "wxpay/jspay";
 	    }
 	    return "error";

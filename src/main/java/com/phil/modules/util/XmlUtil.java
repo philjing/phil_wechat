@@ -111,7 +111,7 @@ public class XmlUtil {
 	 * @throws IOException
 	 * @throws SAXException
 	 */
-	public static TreeMap<Object, Object> parseXmlToTreeMap(String xml, String encoding)
+	public static TreeMap<String, Object> parseXmlToTreeMap(String xml, String encoding)
 			throws ParserConfigurationException, IOException, SAXException {
 		// 这里用Dom的方式解析回包的最主要目的是防止API新增回包字段
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -121,7 +121,7 @@ public class XmlUtil {
 		// 获取到document里面的全部结点
 		org.w3c.dom.NodeList allNodes = document.getFirstChild().getChildNodes();
 		org.w3c.dom.Node node;
-		TreeMap<Object, Object> map = new TreeMap<>();
+		TreeMap<String, Object> map = new TreeMap<>();
 		int i = 0;
 		while (i < allNodes.getLength()) {
 			node = allNodes.item(i);
@@ -141,7 +141,7 @@ public class XmlUtil {
 	 * @throws IOException
 	 * @throws SAXException
 	 */
-	public static Map<Object, Object> parseXmlToMap(String xml, String encoding)
+	public static Map<String, Object> parseXmlToMap(String xml, String encoding)
 			throws ParserConfigurationException, IOException, SAXException {
 		// 这里用Dom的方式解析回包的最主要目的是防止API新增回包字段
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -151,7 +151,7 @@ public class XmlUtil {
 		// 获取到document里面的全部结点
 		org.w3c.dom.NodeList allNodes = document.getFirstChild().getChildNodes();
 		org.w3c.dom.Node node;
-		Map<Object, Object> map = new HashMap<>();
+		Map<String, Object> map = new HashMap<>();
 		int i = 0;
 		while (i < allNodes.getLength()) {
 			node = allNodes.item(i);

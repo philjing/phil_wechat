@@ -8,7 +8,6 @@ import java.util.TreeMap;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -122,7 +121,7 @@ public class WechatPayController extends BaseController {
 				data.put("msg", "支付签名验证错误");
 				logger.debug("签名验证错误");
 			}
-		} catch (ParserConfigurationException | IOException | SAXException | DocumentException e) {
+		} catch (ParserConfigurationException | IOException | SAXException e) {
 			data.put("code", -1);
 			data.put("msg", "支付失败");
 			logger.debug(e.getMessage());
