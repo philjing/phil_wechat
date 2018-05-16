@@ -140,7 +140,7 @@ public class WechatMsgController extends BaseController {
 	private WechatResult coreHandler(BasicMsg msg, Map<String, String> params) {
 		WechatResult result = null;
 		String msgType = params.get("MsgType");
-		if (StringUtils.isEmpty(msgType)) {
+		if (StringUtils.isNotEmpty(msgType)) {
 			switch (msgType) {
 			case MsgConstant.REQ_MESSAGE_TYPE_TEXT: // 文本消息
 				result = wechatMsgService.textMsg(msg, params);
