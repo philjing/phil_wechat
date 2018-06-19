@@ -23,7 +23,7 @@ public class JsonUtil {
 	private static Gson gson = null;
 	static {
 		if (gson == null) {
-			gson = new GsonBuilder().serializeNulls().create();
+			gson = new GsonBuilder().serializeNulls().disableHtmlEscaping().create();
 		}
 	}
 	
