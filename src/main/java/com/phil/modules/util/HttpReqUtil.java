@@ -166,7 +166,11 @@ public class HttpReqUtil {
 				result = builder.toString();
 			}
 		}
-		return doUrlPath(path, result).toString();
+        	if (result.isEmpty()) {
+            		return path;
+        	} else {
+			return doUrlPath(path, result).toString();
+	        }
 	}
 
 	/**
