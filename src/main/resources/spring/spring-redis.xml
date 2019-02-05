@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- scanner redis properties  -->
+    <context:property-placeholder location="classpath:config/redis-dev.properties" ignore-unresolvable="true"/>
+
+    <bean id="poolConfig" class="redis.clients.jedis.JedisPoolConfig">
+        <property name="maxTotal" value="${redis.maxTotal}"/>
+        <property name="maxIdle" value="${redis.maxIdle}"/>
+        <property name="maxWaitMillis" value="${redis.maxWaitMillis}"/>
+        <property name="testOnBorrow" value="${redis.testOnBorrow}"/>
+        <property name="testOnReturn" value="${redis.testOnReturn}"/>
+    </bean>
+
+    <!--&lt;!&ndash;redis链接密码&ndash;&gt;-->
+    <!--<bean id="redisPassword" class="org.springframework.data.redis.connection.RedisPassword">-->
+    <!--<constructor-arg name="thePassword" value="${redis.auth}"></constructor-arg>-->
+    <!--</bean>-->
+
+    <bean id="redisStandaloneConfiguration"
+          class="org.springframework.data.redis.connection.RedisStandaloneConfiguration">
+        <property name="hostName" value="${redis.host}"/>
+        <property name="port" value="${redis.port}"/>
+        <property name="database" value="${redis.dbIndex}"/>
+    </bean>
+
+    <!--配置jedis链接工厂 spring-data-redis2.0中
+           建议改为构造器传入一个RedisStandaloneConfiguration  单机
+                               RedisSentinelConfiguration  主从复制
+                               RedisClusterConfiguration  集群-->
+    <bean id="jedisConnectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+        <!--注销掉的部分为spring-data-redis2.0以下的版本配置的方式-->
+        <!--  <property name="hostName" value="${redis.host}"/>
+          <property name="port" value="${redis.port}"/>
+          <property name="poolConfig" ref="jedisPoolConfig"/>
+          <property name="password" value="${redis.auth}" />
+          <property name="database" value="${redis.dbIndex}"/>-->
+        <!--spring-data-redis2.0以上建议获取的方式-->
+        <constructor-arg name="standaloneConfig" ref="redisStandaloneConfiguration"/>
+    </bean>
+
+    <!--手动设置 key 与 value的序列化方式-->
+    <bean id="keySerializer" class="org.springframework.data.redis.serializer.StringRedisSerializer"/>
+    <bean id="valueSerializer" class="org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer"/>
+
+    <!--配置jedis模板  -->
+    <bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
+        <property name="connectionFactory" ref="jedisConnectionFactory"/>
+        <property name="keySerializer" ref="keySerializer"/>
+        <property name="valueSerializer" ref="valueSerializer"/>
+        <property name="hashKeySerializer" ref="keySerializer"/>
+        <property name="hashValueSerializer" ref="valueSerializer"/>
+    </bean>
+
+    <!--&lt;!&ndash;也可以StringRedisTemplate  专注于String的操作  &ndash;&gt;-->
+    <!--<bean id="stringRedisTemplate" class="org.springframework.data.redis.core.StringRedisTemplate">-->
+    <!--&lt;!&ndash;<property name="connectionFactory" ref="jedisConnectionFactory"></property>&ndash;&gt;-->
+    <!--&lt;!&ndash;在StringRedisTemplate与redisTemplate不同,可以直接造构造器中传入ConnectionFactory&ndash;&gt;-->
+    <!--<constructor-arg name="connectionFactory" ref="jedisConnectionFactory"/>-->
+    <!--<property name="keySerializer" ref="keySerializer" />-->
+    <!--<property name="valueSerializer" ref="valueSerializer" />-->
+    <!--<property name="hashKeySerializer" ref="keySerializer" />-->
+    <!--<property name="hashValueSerializer" ref="valueSerializer" />-->
+    <!--</bean>-->
+
+
+    <!--&lt;!&ndash; 连接redis集群 &ndash;&gt;-->
+    <!--<bean id="jedisClientCluster" class="cn.e3mall.common.jedis.JedisClientCluster">-->
+    <!--<property name="jedisCluster" ref="jedisCluster"/>-->
+    <!--</bean>-->
+    <!--<bean id="jedisCluster" class="redis.clients.jedis.JedisCluster">-->
+    <!--<constructor-arg name="nodes">-->
+    <!--<set>-->
+    <!--<bean class="redis.clients.jedis.HostAndPort">-->
+    <!--<constructor-arg name="host" value="192.168.25.162"></constructor-arg>-->
+    <!--<constructor-arg name="port" value="7001"></constructor-arg>-->
+    <!--</bean>-->
+    <!--<bean class="redis.clients.jedis.HostAndPort">-->
+    <!--<constructor-arg name="host" value="192.168.25.162"></constructor-arg>-->
+    <!--<constructor-arg name="port" value="7002"></constructor-arg>-->
+    <!--</bean>-->
+    <!--<bean class="redis.clients.jedis.HostAndPort">-->
+    <!--<constructor-arg name="host" value="192.168.25.162"></constructor-arg>-->
+    <!--<constructor-arg name="port" value="7003"></constructor-arg>-->
+    <!--</bean>-->
+    <!--<bean class="redis.clients.jedis.HostAndPort">-->
+    <!--<constructor-arg name="host" value="192.168.25.162"></constructor-arg>-->
+    <!--<constructor-arg name="port" value="7004"></constructor-arg>-->
+    <!--</bean>-->
+    <!--<bean class="redis.clients.jedis.HostAndPort">-->
+    <!--<constructor-arg name="host" value="192.168.25.162"></constructor-arg>-->
+    <!--<constructor-arg name="port" value="7005"></constructor-arg>-->
+    <!--</bean>-->
+    <!--<bean class="redis.clients.jedis.HostAndPort">-->
+    <!--<constructor-arg name="host" value="192.168.25.162"></constructor-arg>-->
+    <!--<constructor-arg name="port" value="7006"></constructor-arg>-->
+    <!--</bean>-->
+    <!--</set>-->
+    <!--</constructor-arg>-->
+    <!--</bean>-->
+
+
+</beans>

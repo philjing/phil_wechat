@@ -1,278 +1,270 @@
+/**
+ * FileName: SignatureUtil
+ * Author:   Phil
+ * Date:     8/1/2018 12:32
+ * Description: Signature Util
+ * History:
+ * <author>          <time>          <version>          <desc>
+ * 作者姓名           修改时间           版本号              描述
+ */
 package com.phil.modules.util;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Field;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Objects;
-import java.util.TreeMap;
-
-import javax.xml.parsers.ParserConfigurationException;
-
+import com.phil.modules.annotation.SignName;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.dom4j.DocumentException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
-import com.phil.modules.config.WechatConfig;
-import com.phil.modules.constant.SystemConstant;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.util.*;
 
 /**
- * 签名工具类
- * 待再次重构
- * @author phil
- * @date 2017年7月2日
+ * 〈一句话功能简述〉
+ * 〈Signature Util〉
  *
+ * @author Phil
+ * @create 8/1/2018 12:32
+ * @since 1.0.0
  */
+@Slf4j
 public class SignatureUtil {
 
-	private static Logger logger = LoggerFactory.getLogger(SignatureUtil.class);
+    private SignatureUtil() {
 
-	/**
-	 * 验证签名
-	 * @param signature
-	 * @param timestamp
-	 * @param nonce
-	 * @return
-	 */
-	public static boolean checkSignature(String signature, String timestamp, String nonce) {
-		String[] arr = new String[] { WechatConfig.WECHAT_TOKEN, timestamp, nonce };
-		// 将token、timestamp、nonce三个参数进行字典序排序
-		Arrays.sort(arr);
-		StringBuffer content = new StringBuffer();
-		for (int i = 0; i < arr.length; i++) {
-			content.append(arr[i]);
-		}
-		MessageDigest md = null;
-		String tmpStr = null;
-		try {
-			md = MessageDigest.getInstance("SHA-1");
-			// 将三个参数字符串拼接成一个字符串进行sha1加密
-			byte[] digest = md.digest(content.toString().getBytes());
-			tmpStr = byteToStr(digest);
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		}
-		content = null;
-		// 将sha1加密后的字符串可与signature对比，标识该请求来源于微信
-		return tmpStr != null ? tmpStr.equals(signature.toUpperCase()) : false;
-	}
+    }
 
-	/**
-	 * 将字节数组转换为十六进制字符串
-	 * 
-	 * @param byteArray
-	 * @return
-	 */
-	private static String byteToStr(byte[] byteArray) {
-		String strDigest = "";
-		for (int i = 0; i < byteArray.length; i++) {
-			strDigest += byteToHexStr(byteArray[i]);
-		}
-		return strDigest;
-	}
+    /**
+     * SHA1加密 验证签名
+     *
+     * @param signature 微信签名
+     * @param params    token,timestamp,nonce
+     * @return 是否符合
+     */
+    public static boolean checkSignature(String signature, String... params) {
+        Arrays.sort(params);
+        String str = StringUtils.join(params);
+        String sign = DigestUtils.sha1Hex(str);
+        return Objects.equals(signature, sign);
+    }
 
-	/**
-	 * 将字节转换为十六进制字符串
-	 * 
-	 * @param mByte
-	 * @return
-	 */
-	private static String byteToHexStr(byte mByte) {
-		char[] Digit = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
-		char[] tempArr = new char[2];
-		tempArr[0] = Digit[(mByte >>> 4) & 0X0F];
-		tempArr[1] = Digit[mByte & 0X0F];
-		return new String(tempArr);
-	}
+    /**
+     * @param obj 要参与签名的Clas
+     * @return
+     */
+    public static String md5(Object obj) {
+        String str = notSignParams(obj, null, null);
+        return DigestUtils.md5Hex(str);
+    }
 
-	/**
-	 * 通过Class获取签名
-	 * @param o 待加密的对象 该处仅限于Class
-	 * @param apiKey  公众号key
-	 * @param encoding 编码
-	 * @return
-	 */
-	public static String createSign(Object o, String apiKey, String encoding) {
-		String result = notSignParams(o, apiKey);
-		result = MD5Util.MD5Encode(result, encoding).toUpperCase();
-		return result;
-	}
+    /**
+     * @param obj     要参与签名的Clas
+     * @param keys    参数
+     * @param ignores 忽略的
+     * @return
+     */
+    public static String md5(Object obj, String keys, String[] ignores) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("key", keys);
+        String str = notSignParams(obj, map, ignores);
+        return DigestUtils.md5Hex(str);
+    }
 
-	/**
-	 * 通过Map<String, Object>中的所有元素参与签名
-	 * 
-	 * @param map 待参与签名的map集合
-	 * @params apikey apikey中 如果为空则不参与签名，如果不为空则参与签名
-	 * @return
-	 */
-	public static String createSign(Map<String, Object> map, String apiKey, String encoding) {
-		String result = notSignParams(map, apiKey);
-		result = MD5Util.MD5Encode(result, encoding).toUpperCase();
-		logger.debug("sign result {}", result);
-		return result;
-	}
+    /**
+     * @param obj     要参与签名的Clas
+     * @param keys    参数
+     * @param ignores 忽略的
+     * @return
+     */
+    public static String md5(Object obj, Map<String, Object> keys, String[] ignores) {
+        String str = notSignParams(obj, keys, ignores);
+        return DigestUtils.md5Hex(str);
+    }
 
-	/**
-	 * 通过Map<String, Object>中的所有元素参与签名
-	 * 
-	 * @param map 待参与签名的map集合
-	 * @params apikey apikey中 如果为空则不参与签名，如果不为空则参与签名
-	 * @return
-	 */
-	public static String createSha1Sign(Map<String, Object> map, String apiKey, String encoding) {
-		String result = notSignParams(map, apiKey);
-		MessageDigest md = null;
-		try {
-			md = MessageDigest.getInstance("SHA-1");
-			if(StringUtils.isEmpty(encoding)) {
-				encoding = SystemConstant.DEFAULT_CHARACTER_ENCODING;
-			}
-			byte[] digest = md.digest(result.getBytes(encoding));
-			result = byteToStr(digest);
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-		return result;
-	}
-	
-	/**
-	 * 将字段集合方法转换
-	 * (考虑加入annotation签名注解扫描)
-	 * @param array
-	 * @param object
-	 * @return
-	 * @throws IllegalArgumentException
-	 * @throws IllegalAccessException
-	 */
-	private static ArrayList<String> getFieldList(Field[] array, Object object)
-			throws IllegalArgumentException, IllegalAccessException {
-		ArrayList<String> list = new ArrayList<String>();
-		for (Field f : array) {
-			f.setAccessible(true);
-			if (f.get(object) != null && f.get(object) != "" && !f.getName().equals("serialVersionUID")
-					&& !f.getName().equals("sign")) {
-				if (f.getName().equals("packageStr")) {
-					list.add("package" + "=" + f.get(object) + "&");
-				} else {
-					list.add(f.getName() + "=" + f.get(object) + "&");
-				}
-			}
-		}
-		return list;
-	}
+    /**
+     * @param map     要参与签名的map
+     * @param keys    参数
+     * @param ignores 忽略的
+     * @return 签名
+     */
+    public static String sha1Hex(Map<String, Object> map, Map<String, Object> keys, String[] ignores) {
+        String str = notSignParams(map, keys, ignores);
+        log.info(str);
+        return DigestUtils.sha1Hex(str.getBytes());
+    }
 
-	/**
-	 * 返回未加密的字符串
-	 * @param o 要参与签名的数据对象
-	 * @param apiKey  API密匙
-	 * @return 签名
-	 * @throws IllegalAccessException
-	 */
-	private static String notSignParams(Object o, String apiKey) {
-		ArrayList<String> list = new ArrayList<>();
-		String result = "";
-		try {
-			Class<?> cls = o.getClass();
-			Field[] fields = cls.getDeclaredFields();
-			list = getFieldList(fields, o);
-			Field[] superFields = cls.getSuperclass().getDeclaredFields(); // 获取父类的私有属性
-			list.addAll(getFieldList(superFields, o));
-			int size = list.size();
-			String[] arrayToSort = list.toArray(new String[size]);
-			Arrays.sort(arrayToSort, String.CASE_INSENSITIVE_ORDER); // 严格按字母表顺序排序
-			StringBuffer sb = new StringBuffer();
-			for (int i = 0; i < size; i++) {
-				sb.append(arrayToSort[i]);
-			}
-			result = sb.toString();
-			if (StringUtils.isNotEmpty(apiKey)) {
-				result += "key=" + apiKey;
-			} else {
-				result = result.substring(0, result.lastIndexOf("&"));
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return result;
-	}
-	
-	/**
-	 * 返回未加密的字符串
-	 * @param params
-	 * @param apiKey
-	 * @return 待加密的字符串
-	 */
-	private static String notSignParams(Map<String, Object> params, String apiKey) {
-		ArrayList<String> list = new ArrayList<>();
-		for (Map.Entry<String, Object> entry : params.entrySet()) {
-			if (entry.getValue() != "" && entry.getValue() != null) {
-				list.add(entry.getKey() + "=" + entry.getValue() + "&");
-			}
-		}
-		int size = list.size();
-		String[] arrayToSort = list.toArray(new String[size]);
-		Arrays.sort(arrayToSort, String.CASE_INSENSITIVE_ORDER);
-		StringBuffer sb = new StringBuffer();
-		for (int i = 0; i < size; i++) {
-			sb.append(arrayToSort[i]);
-		}
-		String result = sb.toString();
-		if (StringUtils.isNotEmpty(apiKey)) {
-			result += "key=" + apiKey;
-		} else {
-			result = result.substring(0, result.lastIndexOf("&"));
-		}
-		return result;
-	}
-	
-	/**
-	 * 从API返回的XML数据里面重新计算一次签名
-	 * 
-	 * @param responseStrin API返回的XML数据
-	 * @param apiKey Key
-	 * @return 新的签名
-	 */
-	private static String reCreateSign(Map<String, Object> map, String apiKey, String encoding) {
-		// 清掉返回数据对象里面的Sign数据（不能把这个数据也加进去进行签名），然后用签名算法进行签名
-		map.put("sign", "");
-		// 将API返回的数据根据用签名算法进行计算新的签名，用来跟API返回的签名进行比较
-		return createSign(map, apiKey, encoding);
-	}
 
-	/**
-	 * 检验API返回的数据里面的签名是否合法,规则是:按参数名称a-z排序,遇到空值的参数不参加签名
-	 * @param resultXml  API返回的XML数据字符串
-	 * @param apiKey  Key
-	 * @return API签名是否合法
-	 * @throws ParserConfigurationException
-	 * @throws IOException
-	 * @throws SAXException
-	 * @throws DocumentException
-	 */
-	public static boolean checkIsSignValidFromWeiXin(String checktXml, String apiKey, String encoding) throws ParserConfigurationException, IOException, SAXException {
-		TreeMap<String, Object> map = XmlUtil.parseXmlToTreeMap(checktXml,encoding);
-		String signFromResultXml = (String) map.get("sign");
-		if (StringUtils.isEmpty(signFromResultXml)) {
-			logger.error("API返回的数据签名数据不存在");
-			return false;
-		}
-		// 将API返回的数据根据用签名算法进行计算新的签名，用来跟API返回的签名进行比较
-		String signForAPIResponse = reCreateSign(map, apiKey, encoding);
-		if(!Objects.equals(signFromResultXml, signForAPIResponse)) {
-			// 签名验不过，表示这个API返回的数据有可能已经被篡改了
-			logger.error("API返回的数据签名验证不通过");
-			return false;
-		}
-		logger.debug("API返回的数据签名验证通过");
-		return true;
-	}
-	
+    public static String SHA1(Map<String, Object> map) {
+        try {
+            String decript = notSignParams(map, null, null);
+            log.info(decript);
+            MessageDigest digest = MessageDigest.getInstance("SHA-1");
+            digest.update(decript.getBytes(StandardCharsets.UTF_8));
+            byte[] messageDigest = digest.digest();
+            StringBuilder hexString = new StringBuilder();
+            for (byte message : messageDigest) {
+                String shaHex = Integer.toHexString(message & 0xFF);
+                if (shaHex.length() < 2)
+                    hexString.append(0);
+                hexString.append(shaHex);
+            }
+            return hexString.toString().toLowerCase();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    /**
+     * 从API返回的XML数据封装的Map重新计算一次签名
+     *
+     * @param map     要参与签名的map
+     * @param keys    参数
+     * @param ignores 忽略的
+     * @return
+     */
+    private static String reSign(Map<String, Object> map, Map<String, Object> keys, String[] ignores) {
+        // 清掉返回数据对象里面的Sign数据（不能把这个数据也加进去进行签名），然后用签名算法进行签名
+        // map.put("sign", "");
+        if (ignores != null) {
+            for (String s : ignores) {
+                map.put(s, "");
+            }
+        }
+        return md5(map, keys, ignores);
+    }
+
+    /**
+     * 检验API返回的数据里面的签名是否合法,规则是:按参数名称a-z排序,遇到空值的参数不参加签名
+     *
+     * @param apiXml API返回的XML数据字符串
+     * @param apiKey Key
+     * @return API签名是否有效
+     */
+    public static boolean checkValidPaySign(String apiXml, String apiKey) {
+        Map<String, Object> map = null;
+        try {
+            map = XmlUtil.toMap(apiXml);
+        } catch (ParserConfigurationException | IOException | SAXException e) {
+            log.error(apiXml + "转换出错了");
+            return false;
+        }
+        String apiSign = (String) map.get("sign");
+        if (StringUtils.isEmpty(apiXml)) {
+            log.error("API返回的数据签名数据不存在");
+            return false;
+        }
+        // 将API返回的数据根据用签名算法进行计算新的签名，用来跟API返回的签名进行比较
+        Map<String, Object> keys = new HashMap<>();
+        keys.put("key", apiKey);
+        String reSign = reSign(map, keys, new String[]{"sign"});
+        if (!Objects.equals(apiSign, reSign)) {
+            log.error("API返回的数据签名验证不通过");
+            return false;
+        }
+        log.debug("API返回的数据签名验证通过");
+        return true;
+    }
+
+    /**
+     * 返回未加密的字符串
+     *
+     * @param obj     要参与签名的Clas
+     * @param keys    参数
+     * @param ignores 忽略的
+     * @return 签名
+     */
+    private static String notSignParams(Object obj, Map<String, Object> keys, String[] ignores) {
+        StringBuilder result = new StringBuilder(StringUtils.EMPTY);
+        try {
+            Class<?> cls = obj.getClass();
+            Field[] fields = cls.getDeclaredFields();
+            List<String> list = getFieldList(fields, obj, ignores);
+            Field[] superFields = cls.getSuperclass().getDeclaredFields(); // 获取父类的私有属性
+            list.addAll(getFieldList(superFields, obj, ignores));
+            int size = list.size();
+            if (size <= 0) {
+                return result.toString();
+            }
+            String[] arrayToSort = list.toArray(new String[size]);
+            Arrays.sort(arrayToSort, String.CASE_INSENSITIVE_ORDER); // 严格按字母表顺序排序
+            for (String item : arrayToSort) {
+                result.append(item);
+            }
+            if (keys != null && keys.size() > 0) {
+                for (Map.Entry<String, Object> entry : keys.entrySet()) {
+                    result.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
+                }
+            }
+            result = new StringBuilder(result.substring(0, result.lastIndexOf("&")));
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+        return result.toString();
+    }
+
+    /**
+     * 返回未加密的字符串
+     *
+     * @param keys    参数
+     * @param ignores 忽略的
+     * @return 待加密的字符串
+     */
+    private static String notSignParams(Map<String, Object> params, Map<String, Object> keys, String[] ignores) {
+        StringBuilder result = new StringBuilder();
+        List<String> list = new LinkedList<>();
+        for (Map.Entry<String, Object> entry : params.entrySet()) {
+            if (entry.getValue() != "" && entry.getValue() != null) {
+                list.add(entry.getKey() + "=" + entry.getValue() + "&");
+            }
+        }
+        int size = list.size();
+        if (size <= 0) {
+            return result.toString();
+        }
+        String[] arrayToSort = list.toArray(new String[size]);
+        Arrays.sort(arrayToSort, String.CASE_INSENSITIVE_ORDER);// 严格按字母表顺序排序
+        for (String item : arrayToSort) {
+            result.append(item);
+        }
+        if (keys != null && keys.size() > 0) {
+            for (Map.Entry<String, Object> entry : keys.entrySet()) {
+                result.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
+            }
+        }
+        return result.substring(0, result.lastIndexOf("&"));
+    }
+
+
+    /**
+     * 将字段集合方法转换
+     *
+     * @param fileds
+     * @param object
+     * @param ignores 过滤 sign、serialVersionUID
+     * @return
+     * @throws IllegalArgumentException
+     * @throws IllegalAccessException
+     */
+    private static List<String> getFieldList(Field[] fileds, Object object, String[] ignores)
+            throws IllegalArgumentException, IllegalAccessException {
+        List<String> list = new LinkedList<>();
+        for (Field f : fileds) {
+            if (ArrayUtils.contains(ignores, f.getName())) {
+                continue;
+            }
+            f.setAccessible(true);
+            if (f.isAnnotationPresent(SignName.class)) {
+                SignName name = f.getAnnotation(SignName.class);
+                list.add(name.key() + "=" + f.get(object) + "&");
+            } else {
+                list.add(f.getName() + "=" + f.get(object) + "&");
+            }
+        }
+        return list;
+    }
 }
